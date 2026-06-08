@@ -1,0 +1,364 @@
+import { useState, useEffect, useRef } from "react";
+
+const ACCENT = "#D4922A";
+const BG = "#FAFAF7";
+const CARD = "#FFFFFF";
+const BORDER = "#E8E5DF";
+const TEXT = "#1a1a1a";
+const TEXT2 = "#555";
+const TEXT3 = "#888";
+const FONT = "'Plus Jakarta Sans', sans-serif";
+
+const QUESTIONS = {
+  potenziale: [
+    { id: 1, label: "Problema sentito", text: "Il tuo brand risolve un problema che il cliente sente davvero importante?", hint: "Non convenienza, abitudine o mancanza di alternative. Un problema reale, sentito, concreto." },
+    { id: 2, label: "Difficile da sostituire", text: "Quello che offri sarebbe difficile da sostituire per i clienti abituali?", hint: "Se passassero a un concorrente, perderebbero qualcosa di specifico — o troverebbero un sostituto equivalente in pochi giorni?" },
+    { id: 3, label: "Qualità unica", text: "Hai una qualità, un'esperienza o una capacità che pochi altri nel mercato hanno davvero?", hint: "Togli comunicazione, tono, sito, packaging. Resta qualcosa che un concorrente non può replicare facilmente?" },
+    { id: 4, label: "Test della scomparsa", text: "Se il tuo brand domani smettesse di esistere, i clienti se ne accorgerebbero in pochi giorni?", hint: "Si creerebbe un vuoto riconoscibile, o passerebbero a un altro senza quasi commentare?" },
+  ],
+  percepita: [
+    { id: 5, label: "Nominato spontaneamente", text: "Il tuo brand viene nominato spontaneamente quando si parla della tua categoria?", hint: "Non quando sei tu a presentarlo. Succede che qualcuno lo citi da solo?" },
+    { id: 6, label: "Presente alla scelta", text: "Quando un cliente sta per comprare nella tua categoria, il tuo brand è presente?", hint: "Scaffale, ricerca, marketplace, consiglio, gruppo WhatsApp, comparatore — in quanti di questi luoghi compari?" },
+    { id: 7, label: "Segnale chiaro", text: "Se qualcuno dovesse descrivere il tuo brand a un collega, saprebbe farlo in modo chiaro?", hint: "Ricevi un 'ah, voi siete quelli che...' preciso, o una formula vaga e intercambiabile?" },
+    { id: 8, label: "Scelta naturale", text: "I clienti ti scelgono quando ti incontrano nel momento giusto, o devi inseguirli a lungo?", hint: "Quando incontra la persona giusta, nel momento giusto, qualcosa scatta facilmente?" },
+  ],
+};
+
+const QUADRANTS = {
+  invisibile: {
+    name: "Invisibile", code: "Q1",
+    subtitle: "Né sostanza distintiva né presenza nella mente del cliente",
+    color: "#999", bg: "#F5F5F3",
+    problem: "Il problema non è ancora la comunicazione. È la mancanza di una ragione forte per essere scelti.",
+    actions: [
+      { title: "Costruisci prima, parla dopo", text: "Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla." },
+      { title: "Testa nel reale", text: "Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, aumentare la comunicazione amplifica solo l'irrilevanza." },
+      { title: "Aspetta i tre sì", text: "Solo quando le prime quattro domande restituiscono almeno tre sì, ha senso alzare la voce." },
+    ],
+    warning: "Amplificare un brand che non ha ancora sostanza distintiva significa rendere più visibile un vuoto.",
+    examples: "Nokia nella fase finale — Q4 → Q1",
+  },
+  promessa_fragile: {
+    name: "Promessa fragile", code: "Q2",
+    subtitle: "La percezione è corsa avanti. La sostanza non c'è ancora.",
+    color: "#C75D3A", bg: "#FDF5F2",
+    problem: "Il mercato ha creduto a una promessa che il brand non è ancora in grado di mantenere.",
+    actions: [
+      { title: "Alza la sostanza", text: "Migliorare prodotto, servizio, delivery, customer experience. Porta la realtà all'altezza della narrazione." },
+      { title: "Oppure abbassa la promessa", text: "Comunicare in modo più sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand." },
+      { title: "Mai gonfiare sperando", text: "Continuare a comunicare come se nulla fosse è il modo più veloce per consumare fiducia." },
+    ],
+    warning: "Il tempo lavora contro il brand. Ogni giorno in cui la promessa resta più alta della realtà rende il gap più visibile.",
+    examples: "Allbirds, WeWork — Q4 → Q2",
+  },
+  sottovalutato: {
+    name: "Sottovalutato", code: "Q3",
+    subtitle: "La sostanza c'è. Il mercato non la vede ancora.",
+    color: "#2E7DAF", bg: "#F2F7FB",
+    problem: "Il brand ha sostanza, ma non entra con sufficiente forza nei momenti di scelta.",
+    actions: [
+      { title: "Presidia dove si decide", text: "Scaffale, ricerca, consiglio professionale, social, comparatori. Non ovunque — nei punti che contano." },
+      { title: "Semplifica il segnale", text: "Se ogni cliente descrive il brand in modo diverso, il valore esiste ma non è abbastanza chiaro." },
+      { title: "Costruisci continuità", text: "Essere sempre un po' visibili, nei luoghi giusti, è più utile che essere molto visibili una volta ogni tanto." },
+    ],
+    warning: "Non serve inventarsi un altro brand. Serve far vedere meglio quello che il brand è già.",
+    examples: "Decathlon — Q3 → Q4",
+  },
+  brand_rilevante: {
+    name: "Brand rilevante", code: "Q4",
+    subtitle: "La sostanza c'è. Il mercato la riconosce.",
+    color: "#B8861B", bg: "#FBF7EF",
+    problem: "Il problema non è arrivare. È restare.",
+    actions: [
+      { title: "Monitora promessa ed esperienza", text: "La rilevanza si erode lentamente: cambia il contesto, si standardizza l'esperienza, si allenta la coerenza." },
+      { title: "Difendi il lungo periodo", text: "Continuare a investire nel brand mentre si sostiene la performance. È l'unico modo per mantenere la posizione." },
+      { title: "Rinnova senza tradire", text: "Aggiornare i segnali senza rompere la continuità. Rinnovare senza perdere ciò che rende il brand riconoscibile." },
+    ],
+    warning: "Anche un brand rilevante può smettere di esserlo, se continua a contare su ciò che lo rendeva tale ieri.",
+    examples: "Patagonia — permanenza in Q4",
+  },
+};
+
+function getQuadrant(pot, per) {
+  const pH = pot >= 3, rH = per >= 3;
+  if (pH && rH) return "brand_rilevante";
+  if (!pH && rH) return "promessa_fragile";
+  if (pH && !rH) return "sottovalutato";
+  return "invisibile";
+}
+
+function QuestionCard({ question, answer, onAnswer, number }) {
+  const active = answer !== undefined;
+  return (
+    <div style={{
+      background: CARD, borderRadius: 12,
+      padding: "22px 22px", border: `1px solid ${active ? "#ccc" : BORDER}`,
+      transition: "all 0.3s ease",
+      boxShadow: active ? "0 2px 8px rgba(0,0,0,0.04)" : "none",
+    }}>
+      <div style={{ marginBottom: 10 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, fontFamily: FONT }}>
+          {number}. {question.label}
+        </span>
+      </div>
+      <p style={{ fontSize: 16, lineHeight: 1.55, color: TEXT, fontFamily: FONT, fontWeight: 600, margin: "0 0 6px" }}>
+        {question.text}
+      </p>
+      <p style={{ fontSize: 13, lineHeight: 1.5, color: TEXT3, fontFamily: FONT, margin: "0 0 18px" }}>
+        {question.hint}
+      </p>
+      <div style={{ display: "flex", gap: 10 }}>
+        {[{ l: "Sì", v: 1 }, { l: "No", v: 0 }].map(a => (
+          <button key={a.l} onClick={() => onAnswer(question.id, a.v)} style={{
+            flex: 1, padding: "11px 0", borderRadius: 8,
+            border: answer === a.v ? `2px solid ${a.v === 1 ? ACCENT : "#999"}` : `1px solid ${BORDER}`,
+            background: answer === a.v ? (a.v === 1 ? "#FBF3E6" : "#F5F5F3") : "#FAFAF7",
+            color: answer === a.v ? (a.v === 1 ? "#A06D10" : TEXT) : TEXT3,
+            fontFamily: FONT, fontSize: 14, fontWeight: answer === a.v ? 700 : 500,
+            cursor: "pointer", transition: "all 0.2s ease",
+          }}>
+            {a.l}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Matrix({ potScore, perScore, quadrant }) {
+  const q = QUADRANTS[quadrant];
+  const xPct = 12 + (potScore / 4) * 76;
+  const yPct = 88 - (perScore / 4) * 76;
+
+  return (
+    <div style={{ position: "relative", width: "100%", maxWidth: 380, margin: "0 auto" }}>
+      <div style={{
+        position: "relative", width: "100%", paddingBottom: "100%",
+        background: "#fff", borderRadius: 14, border: `1px solid ${BORDER}`, overflow: "hidden",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+      }}>
+        {/* Quadrant fills */}
+        <div style={{ position: "absolute", left: 0, top: 0, width: "50%", height: "50%", background: "#FDF5F2" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, width: "50%", height: "50%", background: "#FBF7EF" }} />
+        <div style={{ position: "absolute", left: 0, bottom: 0, width: "50%", height: "50%", background: "#F7F7F5" }} />
+        <div style={{ position: "absolute", right: 0, bottom: 0, width: "50%", height: "50%", background: "#F2F7FB" }} />
+
+        {/* Grid lines */}
+        <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "#ddd" }} />
+        <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: 1, background: "#ddd" }} />
+
+        {/* Labels */}
+        {[
+          { t: "Q1\nInvisibile", x: "25%", y: "75%", c: "#bbb" },
+          { t: "Q3\nSottovalutato", x: "75%", y: "75%", c: "#7AABCC" },
+          { t: "Q2\nPromessa\nfragile", x: "25%", y: "25%", c: "#D4845A" },
+          { t: "Q4\nBrand\nrilevante", x: "75%", y: "25%", c: "#C9A050" },
+        ].map(l => (
+          <div key={l.t} style={{
+            position: "absolute", left: l.x, top: l.y, transform: "translate(-50%,-50%)",
+            fontSize: 10, color: l.c, fontFamily: FONT, fontWeight: 700,
+            textAlign: "center", whiteSpace: "pre-line", letterSpacing: 1, textTransform: "uppercase", lineHeight: 1.5,
+          }}>{l.t}</div>
+        ))}
+
+        {/* Dot */}
+        <div style={{
+          position: "absolute", left: `${xPct}%`, top: `${yPct}%`,
+          transform: "translate(-50%,-50%)", zIndex: 10,
+        }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: "50%",
+            background: q.color, boxShadow: `0 2px 12px ${q.color}55`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            animation: "p 2.5s ease-in-out infinite",
+          }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: "#fff", fontFamily: FONT, letterSpacing: 1 }}>TU</span>
+          </div>
+        </div>
+
+        {/* Axis labels */}
+        <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#bbb", fontFamily: FONT, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap" }}>
+          Potenziale →
+        </div>
+        <div style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%) rotate(-90deg)", transformOrigin: "center", fontSize: 9, color: "#bbb", fontFamily: FONT, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap" }}>
+          Percepita →
+        </div>
+      </div>
+      <style>{`@keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}`}</style>
+    </div>
+  );
+}
+
+function Results({ answers, onReset }) {
+  const pot = QUESTIONS.potenziale.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
+  const per = QUESTIONS.percepita.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
+  const qk = getQuadrant(pot, per);
+  const q = QUADRANTS[qk];
+  const is22 = pot === 2 && per === 2;
+
+  const ref = useRef(null);
+  useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, []);
+
+  return (
+    <div ref={ref} style={{ maxWidth: 500, margin: "0 auto", padding: "0 20px" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: TEXT3, marginBottom: 8, fontFamily: FONT }}>{q.code}</div>
+        <h2 style={{ fontSize: 32, fontFamily: FONT, fontWeight: 800, color: q.color, margin: "0 0 6px" }}>{q.name}</h2>
+        <p style={{ fontSize: 14, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0 }}>{q.subtitle}</p>
+      </div>
+
+      <Matrix potScore={pot} perScore={per} quadrant={qk} />
+
+      <div style={{ display: "flex", gap: 12, margin: "24px 0", justifyContent: "center" }}>
+        {[{ l: "Potenziale", s: pot }, { l: "Percepita", s: per }].map(x => (
+          <div key={x.l} style={{
+            flex: 1, maxWidth: 150, background: CARD, borderRadius: 10,
+            padding: "16px 12px", textAlign: "center", border: `1px solid ${BORDER}`,
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, marginBottom: 4, fontFamily: FONT }}>{x.l}</div>
+            <div style={{ fontSize: 30, fontFamily: FONT, fontWeight: 800, color: TEXT }}>{x.s}</div>
+            <div style={{ fontSize: 11, color: TEXT3, fontFamily: FONT }}>su 4 · soglia 3</div>
+          </div>
+        ))}
+      </div>
+
+      {is22 && (
+        <div style={{ background: "#FBF3E6", border: `1px solid #EDD9A8`, borderRadius: 10, padding: "18px", margin: "16px 0", textAlign: "center" }}>
+          <p style={{ fontSize: 14, fontFamily: FONT, fontWeight: 700, color: "#A06D10", margin: "0 0 6px" }}>Il caso 2-2</p>
+          <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, margin: 0, lineHeight: 1.6 }}>
+            Sembra equilibrio, ma non lo è. È una forma meno evidente di invisibilità. La domanda strategica: da dove cominciare — dalla sostanza o dalla percezione?
+          </p>
+        </div>
+      )}
+
+      <div style={{ background: q.bg, borderRadius: 12, padding: "22px 20px", margin: "20px 0 14px", borderLeft: `3px solid ${q.color}` }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, marginBottom: 8, fontFamily: FONT }}>Il problema</div>
+        <p style={{ fontSize: 16, fontFamily: FONT, fontWeight: 600, color: TEXT, margin: 0, lineHeight: 1.5 }}>{q.problem}</p>
+      </div>
+
+      <div style={{ background: "#F5F4F1", borderRadius: 10, padding: "14px 16px", margin: "0 0 22px", border: `1px solid ${BORDER}` }}>
+        <p style={{ fontSize: 12, color: TEXT2, fontFamily: FONT, margin: 0, lineHeight: 1.5 }}>⚠ {q.warning}</p>
+      </div>
+
+      <div style={{ margin: "22px 0" }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: TEXT3, marginBottom: 14, fontFamily: FONT }}>Cosa fare</div>
+        {q.actions.map((a, i) => (
+          <div key={i} style={{ marginBottom: 14, paddingLeft: 16, borderLeft: `2px solid ${q.color}44` }}>
+            <h4 style={{ fontSize: 14, fontFamily: FONT, fontWeight: 700, color: q.color, margin: "0 0 3px" }}>{a.title}</h4>
+            <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0, lineHeight: 1.6 }}>{a.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: "#F5F4F1", borderRadius: 10, padding: "14px 16px", margin: "18px 0", border: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#bbb", marginBottom: 4, fontFamily: FONT }}>Nel libro · stessa traiettoria</div>
+        <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0 }}>{q.examples}</p>
+      </div>
+
+      <div style={{ textAlign: "center", margin: "32px 0 20px", padding: "24px 20px", background: "#FBF7EF", borderRadius: 12, border: "1px solid #EDD9A8" }}>
+        <p style={{ fontSize: 15, fontFamily: FONT, fontWeight: 700, color: TEXT, margin: "0 0 4px", lineHeight: 1.4 }}>
+          La matrice è una mappa.
+        </p>
+        <p style={{ fontSize: 15, fontFamily: FONT, fontWeight: 700, color: ACCENT, margin: "0 0 16px", lineHeight: 1.4 }}>
+          La strategia è la direzione che scegli di prendere.
+        </p>
+        <p style={{ fontSize: 12, color: TEXT3, fontFamily: FONT, margin: "0 0 14px" }}>
+          Perché essere bravi non basta — Il marketing della rilevanza
+        </p>
+        <button onClick={onReset} style={{
+          padding: "10px 24px", borderRadius: 8, border: `1px solid ${ACCENT}`,
+          background: "transparent", color: ACCENT, fontFamily: FONT,
+          fontSize: 12, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
+        }}>Rifai il test</button>
+      </div>
+
+      <p style={{ fontSize: 11, color: "#bbb", fontFamily: FONT, textAlign: "center", margin: "8px 0 32px" }}>
+        Il quadrante in cui ti trovi oggi non è una sentenza. È una posizione.
+      </p>
+    </div>
+  );
+}
+
+export default function App() {
+  const [answers, setAnswers] = useState({});
+  const [phase, setPhase] = useState("intro");
+  const answered = Object.keys(answers).length;
+  const done = answered === 8;
+
+  if (phase === "intro") {
+    return (
+      <div style={{ minHeight: "100vh", background: BG, color: TEXT, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", fontFamily: FONT }}>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <div style={{ maxWidth: 420, textAlign: "center" }}>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 3, textTransform: "uppercase", color: ACCENT, marginBottom: 28, fontFamily: FONT }}>Il marketing della rilevanza</div>
+          <h1 style={{ fontSize: 34, fontWeight: 800, lineHeight: 1.2, margin: "0 0 14px", fontFamily: FONT, color: TEXT }}>Dove sei sulla mappa?</h1>
+          <p style={{ fontSize: 15, color: TEXT2, lineHeight: 1.65, margin: "0 0 8px", fontFamily: FONT }}>Otto domande. Due assi. Quattro posizioni.</p>
+          <p style={{ fontSize: 13, color: TEXT3, lineHeight: 1.5, margin: "0 0 32px", fontFamily: FONT }}>Rispondi sì solo quando il sì è pieno. Se devi spiegare troppo, probabilmente è no.</p>
+          <button onClick={() => setPhase("test")} style={{
+            padding: "14px 40px", borderRadius: 8, border: "none", background: ACCENT,
+            color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 800,
+            cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
+            boxShadow: "0 2px 8px rgba(212,146,42,0.25)",
+          }}>Inizia il test</button>
+          <div style={{ marginTop: 40, display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
+            {["Potenziale × Percepita", "Sì o No", "8 domande"].map(t => (
+              <span key={t} style={{ fontSize: 10, color: "#bbb", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: FONT }}>{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === "results") {
+    return (
+      <div style={{ minHeight: "100vh", background: BG, color: TEXT, padding: "40px 0", fontFamily: FONT }}>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <Results answers={answers} onReset={() => { setAnswers({}); setPhase("intro"); }} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: BG, color: TEXT, padding: "40px 20px 80px", fontFamily: FONT }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <div style={{ maxWidth: 500, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: TEXT, margin: "0 0 8px", fontFamily: FONT }}>Dove sei sulla mappa?</h2>
+          <p style={{ fontSize: 12, color: TEXT3, fontFamily: FONT, margin: "0 0 12px" }}>{answered} di 8</p>
+          <div style={{ width: "100%", height: 3, background: "#E8E5DF", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ width: `${(answered / 8) * 100}%`, height: "100%", background: ACCENT, transition: "width 0.4s ease", borderRadius: 3 }} />
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: ACCENT, marginBottom: 6, fontFamily: FONT }}>Asse 1 — La sostanza</div>
+        <p style={{ fontSize: 13, color: TEXT3, fontFamily: FONT, marginBottom: 14 }}>Il tuo brand ha un valore reale e distintivo?</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
+          {QUESTIONS.potenziale.map((q, i) => (
+            <QuestionCard key={q.id} question={q} answer={answers[q.id]} onAnswer={(id, v) => setAnswers(p => ({ ...p, [id]: v }))} number={i + 1} />
+          ))}
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: ACCENT, marginBottom: 6, fontFamily: FONT }}>Asse 2 — Il riconoscimento</div>
+        <p style={{ fontSize: 13, color: TEXT3, fontFamily: FONT, marginBottom: 14 }}>Il mercato vede e riconosce quel valore?</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
+          {QUESTIONS.percepita.map((q, i) => (
+            <QuestionCard key={q.id} question={q} answer={answers[q.id]} onAnswer={(id, v) => setAnswers(p => ({ ...p, [id]: v }))} number={i + 5} />
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", padding: "14px 0" }}>
+          <button onClick={() => done && setPhase("results")} disabled={!done} style={{
+            padding: "14px 40px", borderRadius: 8, border: "none",
+            background: done ? ACCENT : "#E8E5DF", color: done ? "#fff" : "#bbb",
+            fontFamily: FONT, fontSize: 13, fontWeight: 800, cursor: done ? "pointer" : "default",
+            letterSpacing: 1.5, textTransform: "uppercase", transition: "all 0.3s ease",
+            boxShadow: done ? "0 2px 8px rgba(212,146,42,0.25)" : "none",
+          }}>
+            {done ? "Scopri il tuo quadrante" : `${answered}/8 domande`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
