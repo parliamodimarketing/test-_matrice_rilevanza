@@ -1,364 +1,330 @@
-import { useState, useEffect, useRef } from "react";
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dove sei sulla mappa? — Il marketing della rilevanza</title>
+<meta name="description" content="Otto domande per collocare il tuo brand nella matrice della rilevanza. Dal libro di Barbara Lorenzini.">
+<meta property="og:title" content="Dove sei sulla mappa? — Test della rilevanza">
+<meta property="og:description" content="Otto domande. Due assi. Quattro posizioni. Scopri dove si trova il tuo brand.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#FAFAF7;color:#1a1a1a;-webkit-font-smoothing:antialiased;line-height:1.5}
+button{cursor:pointer;font-family:inherit;outline:none}
+.hidden{display:none}
 
-const ACCENT = "#D4922A";
-const BG = "#FAFAF7";
-const CARD = "#FFFFFF";
-const BORDER = "#E8E5DF";
-const TEXT = "#1a1a1a";
-const TEXT2 = "#555";
-const TEXT3 = "#888";
-const FONT = "'Plus Jakarta Sans', sans-serif";
+/* INTRO */
+.intro{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+.intro-badge{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#D4922A;margin-bottom:28px}
+.intro h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:14px}
+.intro .sub{font-size:15px;color:#555;line-height:1.65;margin-bottom:8px}
+.intro .rule{font-size:13px;color:#888;line-height:1.5;margin-bottom:32px}
+.intro .tags{margin-top:40px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.intro .tags span{font-size:10px;color:#bbb;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
 
-const QUESTIONS = {
-  potenziale: [
-    { id: 1, label: "Problema sentito", text: "Il tuo brand risolve un problema che il cliente sente davvero importante?", hint: "Non convenienza, abitudine o mancanza di alternative. Un problema reale, sentito, concreto." },
-    { id: 2, label: "Difficile da sostituire", text: "Quello che offri sarebbe difficile da sostituire per i clienti abituali?", hint: "Se passassero a un concorrente, perderebbero qualcosa di specifico — o troverebbero un sostituto equivalente in pochi giorni?" },
-    { id: 3, label: "Qualità unica", text: "Hai una qualità, un'esperienza o una capacità che pochi altri nel mercato hanno davvero?", hint: "Togli comunicazione, tono, sito, packaging. Resta qualcosa che un concorrente non può replicare facilmente?" },
-    { id: 4, label: "Test della scomparsa", text: "Se il tuo brand domani smettesse di esistere, i clienti se ne accorgerebbero in pochi giorni?", hint: "Si creerebbe un vuoto riconoscibile, o passerebbero a un altro senza quasi commentare?" },
+/* BUTTONS */
+.btn-primary{padding:14px 40px;border-radius:8px;border:none;background:#D4922A;color:#fff;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 2px 8px rgba(212,146,42,.25)}
+.btn-primary:disabled{background:#E8E5DF;color:#bbb;box-shadow:none;cursor:default}
+.btn-outline{padding:10px 24px;border-radius:8px;border:1px solid #D4922A;background:transparent;color:#D4922A;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+
+/* TEST */
+.test-wrap{max-width:500px;margin:0 auto;padding:40px 20px 80px}
+.test-header{text-align:center;margin-bottom:32px}
+.test-header h2{font-size:22px;font-weight:800;margin-bottom:8px}
+.test-header .count{font-size:12px;color:#888;margin-bottom:12px}
+.progress-bar{width:100%;height:3px;background:#E8E5DF;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#D4922A;border-radius:3px;transition:width .4s ease;width:0}
+.axis-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px}
+.axis-desc{font-size:13px;color:#888;margin-bottom:14px}
+.axis-gap{height:22px}
+
+/* QUESTION CARD */
+.q-card{background:#fff;border-radius:12px;padding:22px;border:1px solid #E8E5DF;margin-bottom:10px;transition:all .3s ease}
+.q-card.answered{border-color:#ccc;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.q-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px}
+.q-text{font-size:16px;line-height:1.55;font-weight:600;margin-bottom:6px}
+.q-hint{font-size:13px;line-height:1.5;color:#888;margin-bottom:18px}
+.q-btns{display:flex;gap:10px}
+.q-btn{flex:1;padding:11px 0;border-radius:8px;border:1px solid #E8E5DF;background:#FAFAF7;color:#888;font-size:14px;font-weight:500;transition:all .2s ease}
+.q-btn.sel-yes{border:2px solid #D4922A;background:#FBF3E6;color:#A06D10;font-weight:700}
+.q-btn.sel-no{border:2px solid #999;background:#F5F5F3;color:#1a1a1a;font-weight:700}
+.submit-wrap{text-align:center;padding:20px 0}
+
+/* RESULTS */
+.results-wrap{max-width:500px;margin:0 auto;padding:40px 20px}
+.res-header{text-align:center;margin-bottom:32px}
+.res-code{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px}
+.res-name{font-size:32px;font-weight:800;margin-bottom:6px}
+.res-sub{font-size:14px;color:#555;font-weight:500}
+
+/* MATRIX */
+.matrix-wrap{position:relative;width:100%;max-width:380px;margin:0 auto}
+.matrix-box{position:relative;width:100%;padding-bottom:100%;border-radius:14px;border:1px solid #E8E5DF;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.matrix-box>div{position:absolute}
+.mq-tl{left:0;top:0;width:50%;height:50%;background:#FDF5F2}
+.mq-tr{right:0;top:0;width:50%;height:50%;background:#FBF7EF}
+.mq-bl{left:0;bottom:0;width:50%;height:50%;background:#F7F7F5}
+.mq-br{right:0;bottom:0;width:50%;height:50%;background:#F2F7FB}
+.m-vline{left:50%;top:0;bottom:0;width:1px;background:#ddd}
+.m-hline{top:50%;left:0;right:0;height:1px;background:#ddd}
+.m-label{font-size:10px;font-weight:700;text-align:center;white-space:pre-line;letter-spacing:1px;text-transform:uppercase;line-height:1.5;transform:translate(-50%,-50%)}
+.m-dot{transform:translate(-50%,-50%);z-index:10}
+.m-dot-inner{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:pulse 2.5s ease-in-out infinite}
+.m-dot-inner span{font-size:10px;font-weight:800;color:#fff;letter-spacing:1px}
+.m-axis{font-size:9px;color:#bbb;font-weight:700;letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.m-axis-x{bottom:8px;left:50%;transform:translateX(-50%)}
+.m-axis-y{left:8px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* SCORES */
+.scores{display:flex;gap:12px;margin:24px 0;justify-content:center}
+.score-box{flex:1;max-width:150px;background:#fff;border-radius:10px;padding:16px 12px;text-align:center;border:1px solid #E8E5DF}
+.score-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:4px}
+.score-num{font-size:30px;font-weight:800}
+.score-max{font-size:11px;color:#888}
+
+/* DIAGNOSIS */
+.case22{background:#FBF3E6;border:1px solid #EDD9A8;border-radius:10px;padding:18px;margin:16px 0;text-align:center}
+.case22 .title{font-size:14px;font-weight:700;color:#A06D10;margin-bottom:6px}
+.case22 .desc{font-size:13px;color:#555;line-height:1.6}
+.problem-box{border-radius:12px;padding:22px 20px;margin:20px 0 14px;border-left:3px solid}
+.problem-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:8px}
+.problem-text{font-size:16px;font-weight:600;line-height:1.5}
+.warn-box{background:#F5F4F1;border-radius:10px;padding:14px 16px;margin-bottom:22px;border:1px solid #E8E5DF}
+.warn-box p{font-size:12px;color:#555;line-height:1.5}
+.actions-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:14px}
+.action-item{margin-bottom:14px;padding-left:16px;border-left:2px solid}
+.action-item h4{font-size:14px;font-weight:700;margin-bottom:3px}
+.action-item p{font-size:13px;color:#555;font-weight:500;line-height:1.6}
+.example-box{background:#F5F4F1;border-radius:10px;padding:14px 16px;margin:18px 0;border:1px solid #E8E5DF}
+.example-box .label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#bbb;margin-bottom:4px}
+.example-box p{font-size:13px;color:#555;font-weight:500}
+.cta-box{text-align:center;margin:32px 0 20px;padding:24px 20px;background:#FBF7EF;border-radius:12px;border:1px solid #EDD9A8}
+.cta-box .line1{font-size:15px;font-weight:700;margin-bottom:4px;line-height:1.4}
+.cta-box .line2{font-size:15px;font-weight:700;color:#D4922A;margin-bottom:16px;line-height:1.4}
+.cta-box .book{font-size:12px;color:#888;margin-bottom:14px}
+.footer-note{font-size:11px;color:#bbb;text-align:center;margin:8px 0 32px}
+</style>
+</head>
+<body>
+
+<!-- INTRO SCREEN -->
+<div id="intro" class="intro">
+  <div class="intro-badge">Il marketing della rilevanza</div>
+  <h1>Dove sei sulla mappa?</h1>
+  <p class="sub">Otto domande. Due assi. Quattro posizioni.</p>
+  <p class="rule">Rispondi sì solo quando il sì è pieno. Se devi spiegare troppo, probabilmente è no.</p>
+  <button class="btn-primary" onclick="startTest()">Inizia il test</button>
+  <div class="tags">
+    <span>Potenziale × Percepita</span>
+    <span>Sì o No</span>
+    <span>8 domande</span>
+  </div>
+</div>
+
+<!-- TEST SCREEN -->
+<div id="test" class="hidden">
+  <div class="test-wrap">
+    <div class="test-header">
+      <h2>Dove sei sulla mappa?</h2>
+      <p class="count" id="counter">0 di 8</p>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="axis-label">Asse 1 — La sostanza</div>
+    <p class="axis-desc">Il tuo brand ha un valore reale e distintivo?</p>
+    <div id="questions-pot"></div>
+    <div class="axis-gap"></div>
+    <div class="axis-label">Asse 2 — Il riconoscimento</div>
+    <p class="axis-desc">Il mercato vede e riconosce quel valore?</p>
+    <div id="questions-per"></div>
+    <div class="submit-wrap">
+      <button class="btn-primary" id="submitBtn" disabled onclick="showResults()">0/8 domande</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="results" class="hidden">
+  <div class="results-wrap" id="resultsContent"></div>
+</div>
+
+<script>
+var questions = {
+  pot: [
+    {id:1,label:"Problema sentito",text:"Il tuo brand risolve un problema che il cliente sente davvero importante?",hint:"Non convenienza, abitudine o mancanza di alternative. Un problema reale, sentito, concreto."},
+    {id:2,label:"Difficile da sostituire",text:"Quello che offri sarebbe difficile da sostituire per i clienti abituali?",hint:"Se passassero a un concorrente, perderebbero qualcosa di specifico — o troverebbero un sostituto equivalente in pochi giorni?"},
+    {id:3,label:"Qualità unica",text:"Hai una qualità, un'esperienza o una capacità che pochi altri nel mercato hanno davvero?",hint:"Togli comunicazione, tono, sito, packaging. Resta qualcosa che un concorrente non può replicare facilmente?"},
+    {id:4,label:"Test della scomparsa",text:"Se il tuo brand domani smettesse di esistere, i clienti se ne accorgerebbero in pochi giorni?",hint:"Si creerebbe un vuoto riconoscibile, o passerebbero a un altro senza quasi commentare?"}
   ],
-  percepita: [
-    { id: 5, label: "Nominato spontaneamente", text: "Il tuo brand viene nominato spontaneamente quando si parla della tua categoria?", hint: "Non quando sei tu a presentarlo. Succede che qualcuno lo citi da solo?" },
-    { id: 6, label: "Presente alla scelta", text: "Quando un cliente sta per comprare nella tua categoria, il tuo brand è presente?", hint: "Scaffale, ricerca, marketplace, consiglio, gruppo WhatsApp, comparatore — in quanti di questi luoghi compari?" },
-    { id: 7, label: "Segnale chiaro", text: "Se qualcuno dovesse descrivere il tuo brand a un collega, saprebbe farlo in modo chiaro?", hint: "Ricevi un 'ah, voi siete quelli che...' preciso, o una formula vaga e intercambiabile?" },
-    { id: 8, label: "Scelta naturale", text: "I clienti ti scelgono quando ti incontrano nel momento giusto, o devi inseguirli a lungo?", hint: "Quando incontra la persona giusta, nel momento giusto, qualcosa scatta facilmente?" },
-  ],
+  per: [
+    {id:5,label:"Nominato spontaneamente",text:"Il tuo brand viene nominato spontaneamente quando si parla della tua categoria?",hint:"Non quando sei tu a presentarlo. Succede che qualcuno lo citi da solo?"},
+    {id:6,label:"Presente alla scelta",text:"Quando un cliente sta per comprare nella tua categoria, il tuo brand è presente?",hint:"Scaffale, ricerca, marketplace, consiglio, gruppo WhatsApp, comparatore — in quanti di questi luoghi compari?"},
+    {id:7,label:"Segnale chiaro",text:"Se qualcuno dovesse descrivere il tuo brand a un collega, saprebbe farlo in modo chiaro?",hint:"Ricevi un 'ah, voi siete quelli che...' preciso, o una formula vaga e intercambiabile?"},
+    {id:8,label:"Scelta naturale",text:"I clienti ti scelgono quando ti incontrano nel momento giusto, o devi inseguirli a lungo?",hint:"Quando incontra la persona giusta, nel momento giusto, qualcosa scatta facilmente?"}
+  ]
 };
 
-const QUADRANTS = {
-  invisibile: {
-    name: "Invisibile", code: "Q1",
-    subtitle: "Né sostanza distintiva né presenza nella mente del cliente",
-    color: "#999", bg: "#F5F5F3",
-    problem: "Il problema non è ancora la comunicazione. È la mancanza di una ragione forte per essere scelti.",
-    actions: [
-      { title: "Costruisci prima, parla dopo", text: "Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla." },
-      { title: "Testa nel reale", text: "Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, aumentare la comunicazione amplifica solo l'irrilevanza." },
-      { title: "Aspetta i tre sì", text: "Solo quando le prime quattro domande restituiscono almeno tre sì, ha senso alzare la voce." },
-    ],
-    warning: "Amplificare un brand che non ha ancora sostanza distintiva significa rendere più visibile un vuoto.",
-    examples: "Nokia nella fase finale — Q4 → Q1",
-  },
-  promessa_fragile: {
-    name: "Promessa fragile", code: "Q2",
-    subtitle: "La percezione è corsa avanti. La sostanza non c'è ancora.",
-    color: "#C75D3A", bg: "#FDF5F2",
-    problem: "Il mercato ha creduto a una promessa che il brand non è ancora in grado di mantenere.",
-    actions: [
-      { title: "Alza la sostanza", text: "Migliorare prodotto, servizio, delivery, customer experience. Porta la realtà all'altezza della narrazione." },
-      { title: "Oppure abbassa la promessa", text: "Comunicare in modo più sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand." },
-      { title: "Mai gonfiare sperando", text: "Continuare a comunicare come se nulla fosse è il modo più veloce per consumare fiducia." },
-    ],
-    warning: "Il tempo lavora contro il brand. Ogni giorno in cui la promessa resta più alta della realtà rende il gap più visibile.",
-    examples: "Allbirds, WeWork — Q4 → Q2",
-  },
-  sottovalutato: {
-    name: "Sottovalutato", code: "Q3",
-    subtitle: "La sostanza c'è. Il mercato non la vede ancora.",
-    color: "#2E7DAF", bg: "#F2F7FB",
-    problem: "Il brand ha sostanza, ma non entra con sufficiente forza nei momenti di scelta.",
-    actions: [
-      { title: "Presidia dove si decide", text: "Scaffale, ricerca, consiglio professionale, social, comparatori. Non ovunque — nei punti che contano." },
-      { title: "Semplifica il segnale", text: "Se ogni cliente descrive il brand in modo diverso, il valore esiste ma non è abbastanza chiaro." },
-      { title: "Costruisci continuità", text: "Essere sempre un po' visibili, nei luoghi giusti, è più utile che essere molto visibili una volta ogni tanto." },
-    ],
-    warning: "Non serve inventarsi un altro brand. Serve far vedere meglio quello che il brand è già.",
-    examples: "Decathlon — Q3 → Q4",
-  },
-  brand_rilevante: {
-    name: "Brand rilevante", code: "Q4",
-    subtitle: "La sostanza c'è. Il mercato la riconosce.",
-    color: "#B8861B", bg: "#FBF7EF",
-    problem: "Il problema non è arrivare. È restare.",
-    actions: [
-      { title: "Monitora promessa ed esperienza", text: "La rilevanza si erode lentamente: cambia il contesto, si standardizza l'esperienza, si allenta la coerenza." },
-      { title: "Difendi il lungo periodo", text: "Continuare a investire nel brand mentre si sostiene la performance. È l'unico modo per mantenere la posizione." },
-      { title: "Rinnova senza tradire", text: "Aggiornare i segnali senza rompere la continuità. Rinnovare senza perdere ciò che rende il brand riconoscibile." },
-    ],
-    warning: "Anche un brand rilevante può smettere di esserlo, se continua a contare su ciò che lo rendeva tale ieri.",
-    examples: "Patagonia — permanenza in Q4",
-  },
+var quads = {
+  invisibile:{name:"Invisibile",code:"Q1",sub:"Né sostanza distintiva né presenza nella mente del cliente",color:"#999",bg:"#F5F5F3",problem:"Il problema non è ancora la comunicazione. È la mancanza di una ragione forte per essere scelti.",actions:[{t:"Costruisci prima, parla dopo",d:"Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla."},{t:"Testa nel reale",d:"Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, aumentare la comunicazione amplifica solo l'irrilevanza."},{t:"Aspetta i tre sì",d:"Solo quando le prime quattro domande restituiscono almeno tre sì, ha senso alzare la voce."}],warn:"Amplificare un brand che non ha ancora sostanza distintiva significa rendere più visibile un vuoto.",ex:"Nokia nella fase finale — Q4 → Q1"},
+  promessa:{name:"Promessa fragile",code:"Q2",sub:"La percezione è corsa avanti. La sostanza non c'è ancora.",color:"#C75D3A",bg:"#FDF5F2",problem:"Il mercato ha creduto a una promessa che il brand non è ancora in grado di mantenere.",actions:[{t:"Alza la sostanza",d:"Migliorare prodotto, servizio, delivery, customer experience. Porta la realtà all'altezza della narrazione."},{t:"Oppure abbassa la promessa",d:"Comunicare in modo più sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand."},{t:"Mai gonfiare sperando",d:"Continuare a comunicare come se nulla fosse è il modo più veloce per consumare fiducia."}],warn:"Il tempo lavora contro il brand. Ogni giorno in cui la promessa resta più alta della realtà rende il gap più visibile.",ex:"Allbirds, WeWork — Q4 → Q2"},
+  sottovalutato:{name:"Sottovalutato",code:"Q3",sub:"La sostanza c'è. Il mercato non la vede ancora.",color:"#2E7DAF",bg:"#F2F7FB",problem:"Il brand ha sostanza, ma non entra con sufficiente forza nei momenti di scelta.",actions:[{t:"Presidia dove si decide",d:"Scaffale, ricerca, consiglio professionale, social, comparatori. Non ovunque — nei punti che contano."},{t:"Semplifica il segnale",d:"Se ogni cliente descrive il brand in modo diverso, il valore esiste ma non è abbastanza chiaro."},{t:"Costruisci continuità",d:"Essere sempre un po' visibili, nei luoghi giusti, è più utile che essere molto visibili una volta ogni tanto."}],warn:"Non serve inventarsi un altro brand. Serve far vedere meglio quello che il brand è già.",ex:"Decathlon — Q3 → Q4"},
+  rilevante:{name:"Brand rilevante",code:"Q4",sub:"La sostanza c'è. Il mercato la riconosce.",color:"#B8861B",bg:"#FBF7EF",problem:"Il problema non è arrivare. È restare.",actions:[{t:"Monitora promessa ed esperienza",d:"La rilevanza si erode lentamente: cambia il contesto, si standardizza l'esperienza, si allenta la coerenza."},{t:"Difendi il lungo periodo",d:"Continuare a investire nel brand mentre si sostiene la performance. È l'unico modo per mantenere la posizione."},{t:"Rinnova senza tradire",d:"Aggiornare i segnali senza rompere la continuità. Rinnovare senza perdere ciò che rende il brand riconoscibile."}],warn:"Anche un brand rilevante può smettere di esserlo, se continua a contare su ciò che lo rendeva tale ieri.",ex:"Patagonia — permanenza in Q4"}
 };
 
-function getQuadrant(pot, per) {
-  const pH = pot >= 3, rH = per >= 3;
-  if (pH && rH) return "brand_rilevante";
-  if (!pH && rH) return "promessa_fragile";
-  if (pH && !rH) return "sottovalutato";
+var answers = {};
+
+function startTest() {
+  document.getElementById("intro").classList.add("hidden");
+  document.getElementById("test").classList.remove("hidden");
+  renderQuestions();
+}
+
+function renderQuestions() {
+  var potEl = document.getElementById("questions-pot");
+  var perEl = document.getElementById("questions-per");
+  potEl.innerHTML = "";
+  perEl.innerHTML = "";
+  questions.pot.forEach(function(q, i) { potEl.innerHTML += cardHTML(q, i + 1); });
+  questions.per.forEach(function(q, i) { perEl.innerHTML += cardHTML(q, i + 5); });
+}
+
+function cardHTML(q, num) {
+  var a = answers[q.id];
+  var answered = a !== undefined;
+  return '<div class="q-card' + (answered ? ' answered' : '') + '" id="card-' + q.id + '">' +
+    '<div class="q-num">' + num + '. ' + q.label + '</div>' +
+    '<p class="q-text">' + q.text + '</p>' +
+    '<p class="q-hint">' + q.hint + '</p>' +
+    '<div class="q-btns">' +
+      '<button class="q-btn' + (a === 1 ? ' sel-yes' : '') + '" onclick="answer(' + q.id + ',1)">Sì</button>' +
+      '<button class="q-btn' + (a === 0 ? ' sel-no' : '') + '" onclick="answer(' + q.id + ',0)">No</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function answer(id, val) {
+  answers[id] = val;
+  renderQuestions();
+  updateProgress();
+}
+
+function updateProgress() {
+  var n = Object.keys(answers).length;
+  document.getElementById("counter").textContent = n + " di 8";
+  document.getElementById("progressFill").style.width = (n / 8 * 100) + "%";
+  var btn = document.getElementById("submitBtn");
+  if (n === 8) {
+    btn.disabled = false;
+    btn.textContent = "Scopri il tuo quadrante";
+  } else {
+    btn.disabled = true;
+    btn.textContent = n + "/8 domande";
+  }
+}
+
+function getQuadrant(p, r) {
+  if (p >= 3 && r >= 3) return "rilevante";
+  if (p < 3 && r >= 3) return "promessa";
+  if (p >= 3 && r < 3) return "sottovalutato";
   return "invisibile";
 }
 
-function QuestionCard({ question, answer, onAnswer, number }) {
-  const active = answer !== undefined;
-  return (
-    <div style={{
-      background: CARD, borderRadius: 12,
-      padding: "22px 22px", border: `1px solid ${active ? "#ccc" : BORDER}`,
-      transition: "all 0.3s ease",
-      boxShadow: active ? "0 2px 8px rgba(0,0,0,0.04)" : "none",
-    }}>
-      <div style={{ marginBottom: 10 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, fontFamily: FONT }}>
-          {number}. {question.label}
-        </span>
-      </div>
-      <p style={{ fontSize: 16, lineHeight: 1.55, color: TEXT, fontFamily: FONT, fontWeight: 600, margin: "0 0 6px" }}>
-        {question.text}
-      </p>
-      <p style={{ fontSize: 13, lineHeight: 1.5, color: TEXT3, fontFamily: FONT, margin: "0 0 18px" }}>
-        {question.hint}
-      </p>
-      <div style={{ display: "flex", gap: 10 }}>
-        {[{ l: "Sì", v: 1 }, { l: "No", v: 0 }].map(a => (
-          <button key={a.l} onClick={() => onAnswer(question.id, a.v)} style={{
-            flex: 1, padding: "11px 0", borderRadius: 8,
-            border: answer === a.v ? `2px solid ${a.v === 1 ? ACCENT : "#999"}` : `1px solid ${BORDER}`,
-            background: answer === a.v ? (a.v === 1 ? "#FBF3E6" : "#F5F5F3") : "#FAFAF7",
-            color: answer === a.v ? (a.v === 1 ? "#A06D10" : TEXT) : TEXT3,
-            fontFamily: FONT, fontSize: 14, fontWeight: answer === a.v ? 700 : 500,
-            cursor: "pointer", transition: "all 0.2s ease",
-          }}>
-            {a.l}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+function showResults() {
+  document.getElementById("test").classList.add("hidden");
+  document.getElementById("results").classList.remove("hidden");
 
-function Matrix({ potScore, perScore, quadrant }) {
-  const q = QUADRANTS[quadrant];
-  const xPct = 12 + (potScore / 4) * 76;
-  const yPct = 88 - (perScore / 4) * 76;
+  var ps = 0, rs = 0;
+  questions.pot.forEach(function(q) { ps += (answers[q.id] || 0); });
+  questions.per.forEach(function(q) { rs += (answers[q.id] || 0); });
 
-  return (
-    <div style={{ position: "relative", width: "100%", maxWidth: 380, margin: "0 auto" }}>
-      <div style={{
-        position: "relative", width: "100%", paddingBottom: "100%",
-        background: "#fff", borderRadius: 14, border: `1px solid ${BORDER}`, overflow: "hidden",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-      }}>
-        {/* Quadrant fills */}
-        <div style={{ position: "absolute", left: 0, top: 0, width: "50%", height: "50%", background: "#FDF5F2" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, width: "50%", height: "50%", background: "#FBF7EF" }} />
-        <div style={{ position: "absolute", left: 0, bottom: 0, width: "50%", height: "50%", background: "#F7F7F5" }} />
-        <div style={{ position: "absolute", right: 0, bottom: 0, width: "50%", height: "50%", background: "#F2F7FB" }} />
+  var qk = getQuadrant(ps, rs);
+  var q = quads[qk];
+  var is22 = ps === 2 && rs === 2;
 
-        {/* Grid lines */}
-        <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "#ddd" }} />
-        <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: 1, background: "#ddd" }} />
+  var xPct = 12 + (ps / 4) * 76;
+  var yPct = 88 - (rs / 4) * 76;
 
-        {/* Labels */}
-        {[
-          { t: "Q1\nInvisibile", x: "25%", y: "75%", c: "#bbb" },
-          { t: "Q3\nSottovalutato", x: "75%", y: "75%", c: "#7AABCC" },
-          { t: "Q2\nPromessa\nfragile", x: "25%", y: "25%", c: "#D4845A" },
-          { t: "Q4\nBrand\nrilevante", x: "75%", y: "25%", c: "#C9A050" },
-        ].map(l => (
-          <div key={l.t} style={{
-            position: "absolute", left: l.x, top: l.y, transform: "translate(-50%,-50%)",
-            fontSize: 10, color: l.c, fontFamily: FONT, fontWeight: 700,
-            textAlign: "center", whiteSpace: "pre-line", letterSpacing: 1, textTransform: "uppercase", lineHeight: 1.5,
-          }}>{l.t}</div>
-        ))}
+  var html = '';
+  html += '<div class="res-header">';
+  html += '<div class="res-code">' + q.code + '</div>';
+  html += '<div class="res-name" style="color:' + q.color + '">' + q.name + '</div>';
+  html += '<p class="res-sub">' + q.sub + '</p>';
+  html += '</div>';
 
-        {/* Dot */}
-        <div style={{
-          position: "absolute", left: `${xPct}%`, top: `${yPct}%`,
-          transform: "translate(-50%,-50%)", zIndex: 10,
-        }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: "50%",
-            background: q.color, boxShadow: `0 2px 12px ${q.color}55`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            animation: "p 2.5s ease-in-out infinite",
-          }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: "#fff", fontFamily: FONT, letterSpacing: 1 }}>TU</span>
-          </div>
-        </div>
+  // Matrix
+  html += '<div class="matrix-wrap"><div class="matrix-box">';
+  html += '<div class="mq-tl"></div><div class="mq-tr"></div><div class="mq-bl"></div><div class="mq-br"></div>';
+  html += '<div class="m-vline"></div><div class="m-hline"></div>';
 
-        {/* Axis labels */}
-        <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#bbb", fontFamily: FONT, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap" }}>
-          Potenziale →
-        </div>
-        <div style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%) rotate(-90deg)", transformOrigin: "center", fontSize: 9, color: "#bbb", fontFamily: FONT, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap" }}>
-          Percepita →
-        </div>
-      </div>
-      <style>{`@keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}`}</style>
-    </div>
-  );
-}
+  var labels = [
+    {t:"Q1\nInvisibile",x:"25%",y:"75%",c:"#bbb"},
+    {t:"Q3\nSottovalutato",x:"75%",y:"75%",c:"#7AABCC"},
+    {t:"Q2\nPromessa\nfragile",x:"25%",y:"25%",c:"#D4845A"},
+    {t:"Q4\nBrand\nrilevante",x:"75%",y:"25%",c:"#C9A050"}
+  ];
+  labels.forEach(function(l) {
+    html += '<div class="m-label" style="left:' + l.x + ';top:' + l.y + ';color:' + l.c + '">' + l.t + '</div>';
+  });
 
-function Results({ answers, onReset }) {
-  const pot = QUESTIONS.potenziale.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
-  const per = QUESTIONS.percepita.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
-  const qk = getQuadrant(pot, per);
-  const q = QUADRANTS[qk];
-  const is22 = pot === 2 && per === 2;
+  html += '<div class="m-dot" style="left:' + xPct + '%;top:' + yPct + '%">';
+  html += '<div class="m-dot-inner" style="background:' + q.color + ';box-shadow:0 2px 12px ' + q.color + '55"><span>TU</span></div>';
+  html += '</div>';
 
-  const ref = useRef(null);
-  useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, []);
+  html += '<div class="m-axis m-axis-x">Potenziale →</div>';
+  html += '<div class="m-axis m-axis-y">Percepita →</div>';
+  html += '</div></div>';
 
-  return (
-    <div ref={ref} style={{ maxWidth: 500, margin: "0 auto", padding: "0 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: TEXT3, marginBottom: 8, fontFamily: FONT }}>{q.code}</div>
-        <h2 style={{ fontSize: 32, fontFamily: FONT, fontWeight: 800, color: q.color, margin: "0 0 6px" }}>{q.name}</h2>
-        <p style={{ fontSize: 14, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0 }}>{q.subtitle}</p>
-      </div>
+  // Scores
+  html += '<div class="scores">';
+  [{l:"Potenziale",s:ps},{l:"Percepita",s:rs}].forEach(function(x) {
+    html += '<div class="score-box"><div class="score-label">' + x.l + '</div><div class="score-num">' + x.s + '</div><div class="score-max">su 4 · soglia 3</div></div>';
+  });
+  html += '</div>';
 
-      <Matrix potScore={pot} perScore={per} quadrant={qk} />
-
-      <div style={{ display: "flex", gap: 12, margin: "24px 0", justifyContent: "center" }}>
-        {[{ l: "Potenziale", s: pot }, { l: "Percepita", s: per }].map(x => (
-          <div key={x.l} style={{
-            flex: 1, maxWidth: 150, background: CARD, borderRadius: 10,
-            padding: "16px 12px", textAlign: "center", border: `1px solid ${BORDER}`,
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, marginBottom: 4, fontFamily: FONT }}>{x.l}</div>
-            <div style={{ fontSize: 30, fontFamily: FONT, fontWeight: 800, color: TEXT }}>{x.s}</div>
-            <div style={{ fontSize: 11, color: TEXT3, fontFamily: FONT }}>su 4 · soglia 3</div>
-          </div>
-        ))}
-      </div>
-
-      {is22 && (
-        <div style={{ background: "#FBF3E6", border: `1px solid #EDD9A8`, borderRadius: 10, padding: "18px", margin: "16px 0", textAlign: "center" }}>
-          <p style={{ fontSize: 14, fontFamily: FONT, fontWeight: 700, color: "#A06D10", margin: "0 0 6px" }}>Il caso 2-2</p>
-          <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, margin: 0, lineHeight: 1.6 }}>
-            Sembra equilibrio, ma non lo è. È una forma meno evidente di invisibilità. La domanda strategica: da dove cominciare — dalla sostanza o dalla percezione?
-          </p>
-        </div>
-      )}
-
-      <div style={{ background: q.bg, borderRadius: 12, padding: "22px 20px", margin: "20px 0 14px", borderLeft: `3px solid ${q.color}` }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: TEXT3, marginBottom: 8, fontFamily: FONT }}>Il problema</div>
-        <p style={{ fontSize: 16, fontFamily: FONT, fontWeight: 600, color: TEXT, margin: 0, lineHeight: 1.5 }}>{q.problem}</p>
-      </div>
-
-      <div style={{ background: "#F5F4F1", borderRadius: 10, padding: "14px 16px", margin: "0 0 22px", border: `1px solid ${BORDER}` }}>
-        <p style={{ fontSize: 12, color: TEXT2, fontFamily: FONT, margin: 0, lineHeight: 1.5 }}>⚠ {q.warning}</p>
-      </div>
-
-      <div style={{ margin: "22px 0" }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: TEXT3, marginBottom: 14, fontFamily: FONT }}>Cosa fare</div>
-        {q.actions.map((a, i) => (
-          <div key={i} style={{ marginBottom: 14, paddingLeft: 16, borderLeft: `2px solid ${q.color}44` }}>
-            <h4 style={{ fontSize: 14, fontFamily: FONT, fontWeight: 700, color: q.color, margin: "0 0 3px" }}>{a.title}</h4>
-            <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0, lineHeight: 1.6 }}>{a.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ background: "#F5F4F1", borderRadius: 10, padding: "14px 16px", margin: "18px 0", border: `1px solid ${BORDER}` }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#bbb", marginBottom: 4, fontFamily: FONT }}>Nel libro · stessa traiettoria</div>
-        <p style={{ fontSize: 13, color: TEXT2, fontFamily: FONT, fontWeight: 500, margin: 0 }}>{q.examples}</p>
-      </div>
-
-      <div style={{ textAlign: "center", margin: "32px 0 20px", padding: "24px 20px", background: "#FBF7EF", borderRadius: 12, border: "1px solid #EDD9A8" }}>
-        <p style={{ fontSize: 15, fontFamily: FONT, fontWeight: 700, color: TEXT, margin: "0 0 4px", lineHeight: 1.4 }}>
-          La matrice è una mappa.
-        </p>
-        <p style={{ fontSize: 15, fontFamily: FONT, fontWeight: 700, color: ACCENT, margin: "0 0 16px", lineHeight: 1.4 }}>
-          La strategia è la direzione che scegli di prendere.
-        </p>
-        <p style={{ fontSize: 12, color: TEXT3, fontFamily: FONT, margin: "0 0 14px" }}>
-          Perché essere bravi non basta — Il marketing della rilevanza
-        </p>
-        <button onClick={onReset} style={{
-          padding: "10px 24px", borderRadius: 8, border: `1px solid ${ACCENT}`,
-          background: "transparent", color: ACCENT, fontFamily: FONT,
-          fontSize: 12, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
-        }}>Rifai il test</button>
-      </div>
-
-      <p style={{ fontSize: 11, color: "#bbb", fontFamily: FONT, textAlign: "center", margin: "8px 0 32px" }}>
-        Il quadrante in cui ti trovi oggi non è una sentenza. È una posizione.
-      </p>
-    </div>
-  );
-}
-
-export default function App() {
-  const [answers, setAnswers] = useState({});
-  const [phase, setPhase] = useState("intro");
-  const answered = Object.keys(answers).length;
-  const done = answered === 8;
-
-  if (phase === "intro") {
-    return (
-      <div style={{ minHeight: "100vh", background: BG, color: TEXT, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", fontFamily: FONT }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-        <div style={{ maxWidth: 420, textAlign: "center" }}>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 3, textTransform: "uppercase", color: ACCENT, marginBottom: 28, fontFamily: FONT }}>Il marketing della rilevanza</div>
-          <h1 style={{ fontSize: 34, fontWeight: 800, lineHeight: 1.2, margin: "0 0 14px", fontFamily: FONT, color: TEXT }}>Dove sei sulla mappa?</h1>
-          <p style={{ fontSize: 15, color: TEXT2, lineHeight: 1.65, margin: "0 0 8px", fontFamily: FONT }}>Otto domande. Due assi. Quattro posizioni.</p>
-          <p style={{ fontSize: 13, color: TEXT3, lineHeight: 1.5, margin: "0 0 32px", fontFamily: FONT }}>Rispondi sì solo quando il sì è pieno. Se devi spiegare troppo, probabilmente è no.</p>
-          <button onClick={() => setPhase("test")} style={{
-            padding: "14px 40px", borderRadius: 8, border: "none", background: ACCENT,
-            color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 800,
-            cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
-            boxShadow: "0 2px 8px rgba(212,146,42,0.25)",
-          }}>Inizia il test</button>
-          <div style={{ marginTop: 40, display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
-            {["Potenziale × Percepita", "Sì o No", "8 domande"].map(t => (
-              <span key={t} style={{ fontSize: 10, color: "#bbb", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: FONT }}>{t}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  // 2-2 case
+  if (is22) {
+    html += '<div class="case22"><p class="title">Il caso 2-2</p><p class="desc">Sembra equilibrio, ma non lo è. È una forma meno evidente di invisibilità. La domanda strategica: da dove cominciare — dalla sostanza o dalla percezione?</p></div>';
   }
 
-  if (phase === "results") {
-    return (
-      <div style={{ minHeight: "100vh", background: BG, color: TEXT, padding: "40px 0", fontFamily: FONT }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-        <Results answers={answers} onReset={() => { setAnswers({}); setPhase("intro"); }} />
-      </div>
-    );
-  }
+  // Problem
+  html += '<div class="problem-box" style="background:' + q.bg + ';border-color:' + q.color + '">';
+  html += '<div class="problem-label">Il problema</div>';
+  html += '<p class="problem-text">' + q.problem + '</p></div>';
 
-  return (
-    <div style={{ minHeight: "100vh", background: BG, color: TEXT, padding: "40px 20px 80px", fontFamily: FONT }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      <div style={{ maxWidth: 500, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: TEXT, margin: "0 0 8px", fontFamily: FONT }}>Dove sei sulla mappa?</h2>
-          <p style={{ fontSize: 12, color: TEXT3, fontFamily: FONT, margin: "0 0 12px" }}>{answered} di 8</p>
-          <div style={{ width: "100%", height: 3, background: "#E8E5DF", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{ width: `${(answered / 8) * 100}%`, height: "100%", background: ACCENT, transition: "width 0.4s ease", borderRadius: 3 }} />
-          </div>
-        </div>
+  // Warning
+  html += '<div class="warn-box"><p>⚠ ' + q.warn + '</p></div>';
 
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: ACCENT, marginBottom: 6, fontFamily: FONT }}>Asse 1 — La sostanza</div>
-        <p style={{ fontSize: 13, color: TEXT3, fontFamily: FONT, marginBottom: 14 }}>Il tuo brand ha un valore reale e distintivo?</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
-          {QUESTIONS.potenziale.map((q, i) => (
-            <QuestionCard key={q.id} question={q} answer={answers[q.id]} onAnswer={(id, v) => setAnswers(p => ({ ...p, [id]: v }))} number={i + 1} />
-          ))}
-        </div>
+  // Actions
+  html += '<div class="actions-title">Cosa fare</div>';
+  q.actions.forEach(function(a) {
+    html += '<div class="action-item" style="border-color:' + q.color + '44"><h4 style="color:' + q.color + '">' + a.t + '</h4><p>' + a.d + '</p></div>';
+  });
 
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: ACCENT, marginBottom: 6, fontFamily: FONT }}>Asse 2 — Il riconoscimento</div>
-        <p style={{ fontSize: 13, color: TEXT3, fontFamily: FONT, marginBottom: 14 }}>Il mercato vede e riconosce quel valore?</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
-          {QUESTIONS.percepita.map((q, i) => (
-            <QuestionCard key={q.id} question={q} answer={answers[q.id]} onAnswer={(id, v) => setAnswers(p => ({ ...p, [id]: v }))} number={i + 5} />
-          ))}
-        </div>
+  // Example
+  html += '<div class="example-box"><div class="label">Nel libro · stessa traiettoria</div><p>' + q.ex + '</p></div>';
 
-        <div style={{ textAlign: "center", padding: "14px 0" }}>
-          <button onClick={() => done && setPhase("results")} disabled={!done} style={{
-            padding: "14px 40px", borderRadius: 8, border: "none",
-            background: done ? ACCENT : "#E8E5DF", color: done ? "#fff" : "#bbb",
-            fontFamily: FONT, fontSize: 13, fontWeight: 800, cursor: done ? "pointer" : "default",
-            letterSpacing: 1.5, textTransform: "uppercase", transition: "all 0.3s ease",
-            boxShadow: done ? "0 2px 8px rgba(212,146,42,0.25)" : "none",
-          }}>
-            {done ? "Scopri il tuo quadrante" : `${answered}/8 domande`}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  // CTA
+  html += '<div class="cta-box">';
+  html += '<p class="line1">La matrice è una mappa.</p>';
+  html += '<p class="line2">La strategia è la direzione che scegli di prendere.</p>';
+  html += '<p class="book">Perché essere bravi non basta — Il marketing della rilevanza</p>';
+  html += '<button class="btn-outline" onclick="resetTest()">Rifai il test</button>';
+  html += '</div>';
+
+  html += '<p class="footer-note">Il quadrante in cui ti trovi oggi non è una sentenza. È una posizione.</p>';
+
+  document.getElementById("resultsContent").innerHTML = html;
+  window.scrollTo({top: 0, behavior: "smooth"});
 }
+
+function resetTest() {
+  answers = {};
+  document.getElementById("results").classList.add("hidden");
+  document.getElementById("intro").classList.remove("hidden");
+  updateProgress();
+}
+</script>
+</body>
+</html>
