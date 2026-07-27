@@ -149,6 +149,17 @@ function trovaQ(p, r){
   return "invisibile";
 }
 
+function inviaRisultato(quad, pot, per){
+  try{
+    var url = "https://docs.google.com/forms/d/e/1FAIpQLSeAq7ZDcsXHEyAds__AN8E4-AronrXA_cTjbAM2wPGEE4lbJA/formResponse";
+    var fd = new FormData();
+    fd.append("entry.1362765793", quad);
+    fd.append("entry.683342459", pot);
+    fd.append("entry.1384225030", per);
+    fetch(url, {method:"POST", mode:"no-cors", body:fd});
+  }catch(e){}
+}
+
 function risultati(){
   if(Object.keys(ans).length < 8) return;
   var ps = 0, rs = 0;
@@ -159,6 +170,7 @@ function risultati(){
   }
   var qk = trovaQ(ps, rs);
   var q = quadranti[qk];
+  inviaRisultato(q.cod + " " + q.nome, ps, rs);
   var xP = 12 + (ps / 4) * 76;
   var yP = 88 - (rs / 4) * 76;
 
