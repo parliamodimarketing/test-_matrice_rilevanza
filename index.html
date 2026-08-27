@@ -21,6 +21,11 @@ button{cursor:pointer;font-family:inherit}
 .qbtn.no{border:2px solid #999;background:#F5F5F3;color:#1a1a1a;font-weight:700}
 .bar{width:100%;height:3px;background:#E8E5DF;border-radius:3px;overflow:hidden;margin-bottom:28px}
 .fill{height:100%;background:#D4922A;border-radius:3px;transition:width .4s}
+.perche{background:none;border:none;color:#A06D10;font-size:12px;font-weight:700;padding:0;margin-bottom:16px;display:inline-flex;align-items:center;gap:5px;letter-spacing:.3px}
+.perche:hover{text-decoration:underline}
+.spieg{font-size:13px;color:#666;line-height:1.65;margin-bottom:18px;padding:14px 16px;background:#FAFAF7;border-radius:8px;border:1px solid #EFEDE7}
+.spieg p{margin-bottom:9px}
+.spieg p:last-child{margin-bottom:0}
 @keyframes pp{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 </style>
 </head>
@@ -47,12 +52,12 @@ button{cursor:pointer;font-family:inherit}
       <p id="cnt" style="font-size:12px;color:#888;margin-bottom:12px">0 di 8</p>
       <div class="bar"><div class="fill" id="bf" style="width:0"></div></div>
     </div>
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px">Asse 1 &mdash; La sostanza</div>
-    <p style="font-size:13px;color:#888;margin-bottom:14px">Il tuo brand ha un valore reale e distintivo?</p>
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px">Asse 1 &mdash; Rilevanza potenziale</div>
+    <p style="font-size:13px;color:#888;margin-bottom:14px">La capacit&agrave; dell'offerta di contare per il pubblico che hai scelto.</p>
     <div id="box1"></div>
     <div style="height:22px"></div>
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px">Asse 2 &mdash; Il riconoscimento</div>
-    <p style="font-size:13px;color:#888;margin-bottom:14px">Il mercato vede e riconosce quel valore?</p>
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px">Asse 2 &mdash; Rilevanza percepita</div>
+    <p style="font-size:13px;color:#888;margin-bottom:14px">Quanto di quel valore quel pubblico riconosce nel momento della scelta.</p>
     <div id="box2"></div>
     <div style="text-align:center;padding:20px 0">
       <button class="btn" id="bSub" disabled onclick="risultati()">0/8 domande</button>
@@ -66,39 +71,48 @@ button{cursor:pointer;font-family:inherit}
 
 <script>
 var ans = {};
+var apri = {};
 
 var domande = [
-  {id:1, n:"1. Problema sentito", q:"Il tuo brand risolve un problema che il cliente sente davvero importante?", h:"Non convenienza, abitudine o mancanza di alternative. Un problema reale, sentito, concreto.", ax:"pot"},
-  {id:2, n:"2. Difficile da sostituire", q:"Quello che offri sarebbe difficile da sostituire per il target che hai in mente?", h:"Perderebbero qualcosa di specifico, o troverebbero un sostituto in pochi giorni?", ax:"pot"},
-  {id:3, n:"3. Qualit\u00e0 unica", q:"Hai una qualit\u00e0 o una capacit\u00e0 che pochi altri nel mercato hanno davvero?", h:"Togli comunicazione, tono, sito, packaging. Resta qualcosa che un concorrente non pu\u00f2 replicare facilmente?", ax:"pot"},
-  {id:4, n:"4. Test della scomparsa", q:"Se il tuo brand smettesse di esistere domani, i clienti se ne accorgerebbero?", h:"Si creerebbe un vuoto riconoscibile, o passerebbero a un altro senza quasi commentare?", ax:"pot"},
-  {id:5, n:"5. Nominato spontaneamente", q:"Il tuo brand viene nominato spontaneamente quando si parla della tua categoria?", h:"Non quando sei tu a presentarlo. Succede che qualcuno lo citi da solo?", ax:"per"},
-  {id:6, n:"6. Presente alla scelta", q:"Quando un cliente sta per scegliere nella tua categoria, il tuo brand \u00e8 presente?", h:"Scaffale, ricerca, marketplace, consiglio, gruppo WhatsApp, comparatore.", ax:"per"},
-  {id:7, n:"7. Segnale chiaro", q:"Se qualcuno dovesse descrivere il tuo brand a un collega, saprebbe farlo in modo chiaro?", h:"Ricevi un riconoscimento preciso, o una formula vaga e intercambiabile?", ax:"per"},
-  {id:8, n:"8. Scelta naturale", q:"Quando un cliente ti incontra nel momento giusto, la scelta scatta con naturalezza?", h:"Oppure ogni vendita va conquistata con insistenza, promozioni e follow-up ripetuti? Se la scelta non scatta mai da sola, il segnale \u00e8 quello.", ax:"per"}
+  {id:1, n:"1. Problema sentito", q:"Il tuo brand risolve un problema che il cliente sente davvero importante?", ax:"pot",
+   s:["Ti sei mai chiesto se il tuo prodotto risolve un problema che al tuo cliente importa davvero?","Pensa alle evidenze che hai raccolto: conversazioni con i clienti, motivazioni d'acquisto, rinnovi, feedback, trattative vinte o perse. Quello che offri risponde a qualcosa che, per quel pubblico, ha un peso reale?","Qui \u201cproblema\u201d va inteso in senso ampio. Pu\u00f2 essere un bisogno funzionale o economico, ma anche un desiderio, un risultato che la persona vuole raggiungere, un bisogno di appartenenza, status, riconoscimento o espressione di s\u00e9.","Un brand con rilevanza potenziale non \u00e8 semplicemente un'opzione in pi\u00f9: ha la capacit\u00e0 di rispondere a qualcosa che, per quel pubblico, conta davvero."]},
+  {id:2, n:"2. Difficile da sostituire", q:"Quello che il tuo brand offre sarebbe difficile da sostituire per il target che hai in mente?", ax:"pot",
+   s:["Pensa al pubblico che hai scelto e alle alternative concrete che ha a disposizione. Sulla base delle evidenze che possiedi, se dovesse rinunciare alla tua offerta troverebbe facilmente qualcosa di equivalente oppure perderebbe qualcosa che per lui conta?","Pu\u00f2 essere un risultato, una qualit\u00e0, un'esperienza, una relazione, una competenza, una semplicit\u00e0, una convenienza o un modo particolare di ottenere ci\u00f2 che cerca.","Non significa che il tuo brand debba essere unico o privo di concorrenti. La domanda \u00e8 un'altra: quanto facilmente un'alternativa potrebbe sostituire ci\u00f2 che la tua offerta \u00e8 in grado di rappresentare o produrre per quel pubblico?","Pi\u00f9 le alternative risultano equivalenti rispetto a ci\u00f2 che per quel pubblico conta, pi\u00f9 debole \u00e8 la rilevanza potenziale. Pi\u00f9 la sostituzione comporta la perdita di qualcosa di significativo, pi\u00f9 esiste una ragione concreta perch\u00e9 quel brand continui a contare."]},
+  {id:3, n:"3. Qualit\u00e0 distintiva", q:"Quello che vendi ha una qualit\u00e0, un'esperienza o una capacit\u00e0 che pochi altri nel mercato hanno davvero?", ax:"pot",
+   s:["Prova a togliere per un momento comunicazione, tono di voce, sito, packaging e presentazione commerciale. Resta qualcosa di sostanziale che, per il pubblico che hai scelto, distingue davvero la tua offerta dalle alternative?","Pu\u00f2 essere una qualit\u00e0 del prodotto, un'esperienza, una competenza, un processo, un ingrediente, un'infrastruttura, una relazione, un know-how, un modello di servizio o una capacit\u00e0 costruita nel tempo.","Non deve essere necessariamente unico al mondo o impossibile da copiare. Deve per\u00f2 essere reale, significativo per quel pubblico e sufficientemente distintivo da contribuire alla ragione per cui il brand pu\u00f2 contare.","Se fai fatica a indicare con precisione quale elemento produce questa differenza, chiediti quali evidenze hai per sostenerla e se ci\u00f2 che dall'interno consideri speciale lo sia davvero rispetto alle alternative concrete."]},
+  {id:4, n:"4. Test della scomparsa", q:"Se il tuo brand domani smettesse di esistere, i clienti che hai in mente se ne accorgerebbero rapidamente?", ax:"pot",
+   s:["Pensa al pubblico che hai scelto e alle evidenze che hai raccolto nel tempo. Se il tuo brand smettesse di esistere, la sua assenza lascerebbe un vuoto riconoscibile per quelle persone oppure il passaggio a un'alternativa sarebbe quasi indifferente?","Quel vuoto pu\u00f2 riguardare un risultato, un'esperienza, una relazione, una sicurezza, un'abitudine significativa, un modo particolare di risolvere un problema o di ottenere qualcosa che per quel pubblico conta.","Questa domanda non misura quante alternative esistono, ma quanto peserebbe la tua assenza. Un brand pu\u00f2 avere molti sostituti sulla carta e lasciare comunque un vuoto difficile da colmare.","Pi\u00f9 l'assenza del brand comporterebbe la perdita di qualcosa di significativo per quel pubblico, pi\u00f9 forte \u00e8 il segnale di rilevanza potenziale: \u00e8 la differenza tra essere rimpiazzabili ed essere dimenticabili."]},
+  {id:5, n:"5. Nominato spontaneamente", q:"Il tuo brand viene nominato spontaneamente quando si parla della categoria in cui opera?", ax:"per",
+   s:["Pensa al pubblico che hai scelto e alle evidenze che hai a disposizione. Quando quelle persone parlano della categoria, delle alternative o del bisogno che il tuo brand pu\u00f2 soddisfare, il tuo nome emerge spontaneamente oppure deve essere suggerito?","Puoi cercare questo segnale nelle conversazioni con clienti e potenziali clienti, nelle ricerche, nelle richieste commerciali, nelle recensioni, nelle community o in altri contesti in cui quel pubblico parla e sceglie.","Essere nominati spontaneamente non significa soltanto essere conosciuti. \u00c8 un segnale pi\u00f9 interessante quando mostra che il brand \u00e8 gi\u00e0 collegato, nella mente di quel pubblico, alla categoria o alla situazione in cui la scelta pu\u00f2 prendere forma.","Pi\u00f9 il brand emerge senza bisogno di essere sollecitato, pi\u00f9 \u00e8 probabile che abbia costruito una presenza mentale riconoscibile presso quel pubblico. Da solo, questo segnale non basta a dimostrare alta rilevanza percepita: va letto insieme alle altre domande dell'asse."]},
+  {id:6, n:"6. Presente alla scelta", q:"Quando un cliente sta per scegliere qualcosa della tua categoria, il tuo brand \u00e8 presente?", ax:"per",
+   s:["Pensa al pubblico che hai scelto e al momento di scelta che hai definito. Nei luoghi in cui quella decisione prende realmente forma, il tuo brand \u00e8 presente?","Pu\u00f2 trattarsi di uno scaffale, di un motore di ricerca, di un marketplace, della carta di un ristorante, del consiglio di un professionista, di una conversazione tra pari, di una recensione o di qualunque altro punto che abbia un ruolo concreto nella scelta.","La presenza non coincide con la rilevanza, ma \u00e8 una condizione perch\u00e9 la rilevanza possa entrare nella scelta. Un brand pu\u00f2 avere valore ed essere riconosciuto, ma se non compare nei momenti e nei luoghi che contano per quel pubblico, quel valore rischia di restare fuori dalla decisione.","La domanda, quindi, non \u00e8 quanto il brand sia presente in assoluto, ma se sia presente nei punti che hanno concretamente peso per quel pubblico e per quella specifica scelta. Qui stai verificando se il brand c'\u00e8. Pi\u00f9 avanti verificherai se, una volta presente, viene anche riconosciuto come una risposta possibile."]},
+  {id:7, n:"7. Segnale chiaro", q:"Le persone del pubblico che hai scelto sanno descrivere il tuo brand con parole loro?", ax:"per",
+   s:["Pensa al pubblico che hai scelto e alle evidenze che hai raccolto. Quando quelle persone parlano del tuo brand, riescono a spiegare con parole proprie che cosa rappresenta, che cosa offre o perch\u00e9 potrebbe contare per loro?","Ricevi una risposta precisa \u2014 \u201cah, voi siete quelli che\u2026\u201d \u2014 oppure descrizioni vaghe, generiche o intercambiabili con quelle di molti altri brand?","Non stai cercando la ripetizione dello slogan o delle parole usate dall'azienda. Le espressioni possono essere diverse: ci\u00f2 che conta \u00e8 che il significato centrale rimanga riconoscibile e sufficientemente coerente.","Quando persone diverse restituiscono, con parole proprie, un'idea simile di ci\u00f2 che il brand rappresenta, \u00e8 un segnale che il valore \u00e8 arrivato in modo leggibile. Quando invece le descrizioni sono confuse, molto diverse tra loro o genericamente positive, il brand potrebbe non avere ancora costruito un significato abbastanza chiaro nella mente di quel pubblico."]},
+  {id:8, n:"8. Risposta possibile", q:"Nel momento di scelta che hai dichiarato, il tuo brand \u00e8 gi\u00e0 una risposta possibile?", ax:"per",
+   s:["Pensa al pubblico e al momento di scelta che hai definito. Sulla base delle evidenze che hai a disposizione, il tuo brand entra gi\u00e0 tra le alternative che quelle persone possono prendere concretamente in considerazione?","Compare nelle shortlist, nelle richieste di informazioni, nei confronti con i concorrenti, nelle trattative o negli altri segnali attraverso cui, nella tua categoria, puoi osservare che un brand \u00e8 diventato una possibilit\u00e0 reale?","Essere presenti non basta. Un brand pu\u00f2 comparire nel momento giusto e restare comunque fuori dalla considerazione, perch\u00e9 il pubblico non comprende ancora abbastanza chiaramente perch\u00e9 dovrebbe prenderlo in esame rispetto alle alternative.","La domanda 6 verifica se il brand \u00e8 presente nel momento della scelta. Questa verifica se quella presenza si traduce in considerazione. Quando un brand \u00e8 gi\u00e0 una risposta possibile, non significa che verr\u00e0 necessariamente scelto: significa che \u00e8 riuscito a entrare realmente nel campo della decisione."]}
 ];
 
 var quadranti = {
-  invisibile: {nome:"Invisibile", cod:"Q1", desc:"N\u00e9 sostanza distintiva n\u00e9 presenza nella mente del cliente", col:"#999", sfondo:"#F5F5F3",
+  invisibile: {nome:"Invisibile", cod:"Q1", desc:"N\u00e9 sostanza distintiva n\u00e9 presenza nella mente del cliente.", col:"#999", sfondo:"#F5F5F3",
     prob:"Il problema non \u00e8 la comunicazione. \u00c8 la mancanza di una ragione forte per essere scelti.",
-    az:[["Costruisci prima, parla dopo","Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla."],["Testa nel reale","Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, comunicare amplifica solo il vuoto."],["Aspetta i tre s\u00ec","Solo quando le prime quattro domande restituiscono almeno tre s\u00ec, ha senso alzare la voce."]],
+    az:[["Costruisci prima, parla dopo","Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla."],["Testa nel reale","Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, comunicare amplifica solo il vuoto."],["Muovi prima l'asse debole","Solo quando le prime quattro domande restituiscono almeno tre s\u00ec ha senso alzare la voce."]],
     avviso:"Amplificare un brand che non ha ancora sostanza distintiva significa rendere pi\u00f9 visibile un vuoto.",
     esempio:"Nokia nella fase finale \u2014 da Q4 a Q1"},
   promessa: {nome:"Promessa fragile", cod:"Q2", desc:"La percezione \u00e8 corsa avanti. La sostanza non c'\u00e8 ancora.", col:"#C75D3A", sfondo:"#FDF5F2",
     prob:"Il mercato ha creduto a una promessa che il brand non \u00e8 ancora in grado di mantenere.",
-    az:[["Alza la sostanza","Migliorare prodotto, servizio, delivery, customer experience. Porta la realt\u00e0 all'altezza della narrazione."],["Oppure abbassa la promessa","Comunicare in modo pi\u00f9 sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand."],["Mai gonfiare la promessa","Continuare a comunicare come se nulla fosse, sperando che la sostanza arrivi da sola, \u00e8 il modo pi\u00f9 veloce per consumare fiducia. Non arriva."]],
+    az:[["Alza la sostanza","Migliorare prodotto, servizio, delivery, esperienza. Porta la realt\u00e0 all'altezza della narrazione."],["Oppure abbassa la promessa","Comunicare in modo pi\u00f9 sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand."],["Sospendi la spinta","\u00c8 l'unico quadrante in cui alzare la voce peggiora le cose: pi\u00f9 visibilit\u00e0 significa pi\u00f9 persone che verificano una promessa che non regge."]],
     avviso:"Il tempo lavora contro il brand. Ogni giorno in cui la promessa resta pi\u00f9 alta della realt\u00e0 rende il gap pi\u00f9 visibile.",
-    esempio:"Starbucks negli ultimi anni \u2014 da Q4 verso Q2"},
+    esempio:"Mr Beast Burger \u2014 da Q2 a Q1"},
   sottovalutato: {nome:"Sottovalutato", cod:"Q3", desc:"La sostanza c'\u00e8. Il mercato non la vede ancora.", col:"#2E7DAF", sfondo:"#F2F7FB",
     prob:"Il brand ha sostanza, ma non entra con sufficiente forza nei momenti di scelta.",
     az:[["Presidia dove si decide","Scaffale, ricerca, consiglio professionale, social, comparatori. Non ovunque: nei punti che contano."],["Semplifica il segnale","Se ogni cliente descrive il brand in modo diverso, il valore esiste ma non \u00e8 abbastanza chiaro."],["Costruisci continuit\u00e0","Essere sempre un po' visibili, nei luoghi giusti, \u00e8 pi\u00f9 utile che essere molto visibili una volta ogni tanto."]],
     avviso:"Non serve inventarsi un altro brand. Serve far vedere meglio quello che il brand \u00e8 gi\u00e0.",
-    esempio:"Decathlon, Cortilia \u2014 da Q3 a Q4"},
+    esempio:"Decathlon \u2014 da Q3 a Q4"},
   rilevante: {nome:"Brand rilevante", cod:"Q4", desc:"La sostanza c'\u00e8. Il mercato la riconosce.", col:"#B8861B", sfondo:"#FBF7EF",
     prob:"Il problema non \u00e8 arrivare. \u00c8 restare.",
     az:[["Monitora promessa ed esperienza","La rilevanza si erode lentamente: cambia il contesto, si standardizza l'esperienza, si allenta la coerenza."],["Difendi il lungo periodo","Continuare a investire nel brand mentre si sostiene la performance. \u00c8 il solo modo per mantenere la posizione."],["Rinnova senza tradire","Aggiornare i segnali senza rompere la continuit\u00e0. Rinnovare senza perdere ci\u00f2 che rende il brand riconoscibile."]],
     avviso:"Anche un brand rilevante pu\u00f2 smettere di esserlo, se continua a contare su ci\u00f2 che lo rendeva tale ieri.",
-    esempio:"Nutella, Patagonia \u2014 permanenza in Q4"}
+    esempio:"Nutella \u2014 permanenza in Q4"}
 };
 
 function inizia(){
@@ -113,6 +127,11 @@ function rispondi(id, val){
   aggiorna();
 }
 
+function toggle(id){
+  apri[id] = !apri[id];
+  disegna();
+}
+
 function disegna(){
   var b1 = document.getElementById("box1");
   var b2 = document.getElementById("box2");
@@ -122,8 +141,13 @@ function disegna(){
     var d = domande[i];
     var html = '<div class="card' + (ans[d.id] !== undefined ? ' done' : '') + '">';
     html += '<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px">' + d.n + '</div>';
-    html += '<p style="font-size:16px;font-weight:600;line-height:1.55;margin-bottom:6px">' + d.q + '</p>';
-    html += '<p style="font-size:13px;color:#888;line-height:1.5;margin-bottom:18px">' + d.h + '</p>';
+    html += '<p style="font-size:16px;font-weight:600;line-height:1.55;margin-bottom:12px">' + d.q + '</p>';
+    html += '<button class="perche" onclick="toggle(' + d.id + ')">' + (apri[d.id] ? '&minus; nascondi' : '&#43; perch&eacute; questa domanda?') + '</button>';
+    if(apri[d.id]){
+      html += '<div class="spieg">';
+      for(var k = 0; k < d.s.length; k++){ html += '<p>' + d.s[k] + '</p>'; }
+      html += '</div>';
+    }
     html += '<div style="display:flex;gap:10px">';
     html += '<button class="qbtn' + (ans[d.id] === 1 ? ' si' : '') + '" onclick="rispondi(' + d.id + ',1)">S\u00ec</button>';
     html += '<button class="qbtn' + (ans[d.id] === 0 ? ' no' : '') + '" onclick="rispondi(' + d.id + ',0)">No</button>';
@@ -208,8 +232,8 @@ function risultati(){
 
   if(ps === 2 && rs === 2){
     h += '<div style="background:#FBF3E6;border:1px solid #EDD9A8;border-radius:10px;padding:18px;margin-bottom:20px;text-align:center">';
-    h += '<div style="font-size:14px;font-weight:700;color:#A06D10;margin-bottom:6px">Il caso 2-2</div>';
-    h += '<div style="font-size:13px;color:#555;line-height:1.6">Sembra equilibrio, ma non lo &egrave;. &Egrave; una forma meno evidente di invisibilit&agrave;. La domanda strategica: da dove cominciare, dalla sostanza o dalla percezione?</div></div>';
+    h += '<div style="font-size:14px;font-weight:700;color:#A06D10;margin-bottom:6px">Non lo sai ancora</div>';
+    h += '<div style="font-size:13px;color:#555;line-height:1.6">Un 2-2 sembra equilibrio, ma spesso indica che a diverse domande hai risposto senza un\'evidenza chiara. Prima di scegliere un quadrante, torna ad ascoltare il cliente: la diagnosi diventa affidabile solo quando le risposte poggiano su prove, non su impressioni.</div></div>';
   }
 
   h += '<div style="background:' + q.sfondo + ';border-radius:12px;padding:22px 20px;margin-bottom:14px;border-left:3px solid ' + q.col + '">';
@@ -236,7 +260,7 @@ function risultati(){
   h += '<button style="padding:10px 24px;border-radius:8px;border:1px solid #D4922A;background:none;color:#D4922A;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer" onclick="ricomincia()">Rifai il test</button>';
   h += '</div>';
 
-  h += '<p style="font-size:11px;color:#bbb;text-align:center;margin:8px 0 32px;line-height:1.6">Il quadrante in cui ti trovi oggi non &egrave; una sentenza. &Egrave; una posizione.</p>';
+  h += '<p style="font-size:11px;color:#bbb;text-align:center;margin:8px 0 32px;line-height:1.6">Il quadrante in cui ti trovi oggi non &egrave; una sentenza. &Egrave; una posizione. E le posizioni si cambiano.</p>';
 
   document.getElementById("resBox").innerHTML = h;
   document.getElementById("p-test").style.display = "none";
@@ -246,6 +270,7 @@ function risultati(){
 
 function ricomincia(){
   ans = {};
+  apri = {};
   document.getElementById("p-res").style.display = "none";
   document.getElementById("p-intro").style.display = "flex";
 }
