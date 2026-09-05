@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dove sei sulla mappa? | Where are you on the map?</title>
+<meta name="description" content="Otto domande per collocare il tuo brand nella matrice della rilevanza. Eight questions to place your brand on the relevance matrix.">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Plus Jakarta Sans",sans-serif;background:#FAFAF7;color:#1a1a1a;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit}
+#p-lang,#p-intro,#p-test,#p-res{min-height:100vh;padding:40px 20px}
+.wrap{max-width:500px;margin:0 auto}
+.btn{padding:14px 40px;border-radius:8px;border:none;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:#D4922A;color:#fff;box-shadow:0 2px 8px rgba(212,146,42,.25)}
+.btn:disabled{background:#E8E5DF;color:#bbb;box-shadow:none;cursor:default}
+.langbtn{padding:16px 44px;border-radius:10px;border:2px solid #E8E5DF;background:#fff;font-size:16px;font-weight:700;color:#1a1a1a;margin:8px;min-width:180px;transition:all .2s}
+.langbtn:hover{border-color:#D4922A;background:#FBF3E6;color:#A06D10}
+.card{background:#fff;border-radius:12px;padding:22px;border:1px solid #E8E5DF;margin-bottom:10px;transition:all .3s}
+.card.done{border-color:#ccc;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.qbtn{flex:1;padding:11px 0;border-radius:8px;border:1px solid #E8E5DF;background:#FAFAF7;color:#888;font-size:14px;font-weight:500;transition:all .2s}
+.qbtn.si{border:2px solid #D4922A;background:#FBF3E6;color:#A06D10;font-weight:700}
+.qbtn.no{border:2px solid #999;background:#F5F5F3;color:#1a1a1a;font-weight:700}
+.bar{width:100%;height:3px;background:#E8E5DF;border-radius:3px;overflow:hidden;margin-bottom:28px}
+.fill{height:100%;background:#D4922A;border-radius:3px;transition:width .4s}
+.perche{background:none;border:none;color:#A06D10;font-size:12px;font-weight:700;padding:0;margin-bottom:16px;display:inline-flex;align-items:center;gap:5px;letter-spacing:.3px}
+.perche:hover{text-decoration:underline}
+.spieg{font-size:13px;color:#666;line-height:1.65;margin-bottom:18px;padding:14px 16px;background:#FAFAF7;border-radius:8px;border:1px solid #EFEDE7}
+.spieg p{margin-bottom:9px}
+.spieg p:last-child{margin-bottom:0}
+@keyframes pp{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+</head>
+<body>
+
+<!-- SCHERMATA SCELTA LINGUA -->
+<div id="p-lang" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+  <div style="max-width:420px">
+    <div style="font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#D4922A;margin-bottom:24px">Parliamo di Marketing</div>
+    <h1 style="font-size:30px;font-weight:800;line-height:1.2;margin-bottom:10px">Dove sei sulla mappa?<br><span style="color:#888;font-size:24px">Where are you on the map?</span></h1>
+    <p style="font-size:14px;color:#888;margin-bottom:32px;line-height:1.6">Scegli la lingua &middot; Choose your language</p>
+    <div>
+      <button class="langbtn" onclick="setLang('it')">Italiano</button>
+      <button class="langbtn" onclick="setLang('en')">English</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div id="p-intro" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+  <div style="max-width:420px">
+    <div id="i-kicker" style="font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#D4922A;margin-bottom:28px"></div>
+    <h1 id="i-titolo" style="font-size:34px;font-weight:800;line-height:1.2;margin-bottom:14px"></h1>
+    <p id="i-sub1" style="font-size:15px;color:#555;margin-bottom:8px;line-height:1.6"></p>
+    <p id="i-sub2" style="font-size:13px;color:#888;margin-bottom:32px;line-height:1.6"></p>
+    <button class="btn" id="i-inizia" onclick="inizia()"></button>
+    <div style="margin-top:40px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap">
+      <span id="i-tag1" style="font-size:10px;color:#bbb;font-weight:700;letter-spacing:1.5px;text-transform:uppercase"></span>
+      <span id="i-tag2" style="font-size:10px;color:#bbb;font-weight:700;letter-spacing:1.5px;text-transform:uppercase"></span>
+    </div>
+  </div>
+</div>
+
+<!-- TEST -->
+<div id="p-test" style="display:none">
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:24px">
+      <h2 id="t-titolo" style="font-size:22px;font-weight:800;margin-bottom:8px"></h2>
+      <p id="cnt" style="font-size:12px;color:#888;margin-bottom:12px"></p>
+      <div class="bar"><div class="fill" id="bf" style="width:0"></div></div>
+    </div>
+    <div id="t-ax1" style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px"></div>
+    <p id="t-ax1s" style="font-size:13px;color:#888;margin-bottom:14px"></p>
+    <div id="box1"></div>
+    <div style="height:22px"></div>
+    <div id="t-ax2" style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px"></div>
+    <p id="t-ax2s" style="font-size:13px;color:#888;margin-bottom:14px"></p>
+    <div id="box2"></div>
+    <div style="height:28px"></div>
+    <div style="border-top:1px solid #E8E5DF;padding-top:24px">
+      <div id="t-duecose" style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:6px"></div>
+      <p id="t-duecose-s" style="font-size:13px;color:#888;margin-bottom:18px"></p>
+      <label id="t-settore-l" style="display:block;font-size:14px;font-weight:600;margin-bottom:8px"></label>
+      <select id="settore" onchange="checkPronto()" style="width:100%;padding:12px;border-radius:8px;border:1px solid #E8E5DF;background:#FAFAF7;font-size:15px;font-family:inherit;color:#1a1a1a;margin-bottom:20px"></select>
+      <label id="t-dim-l" style="display:block;font-size:14px;font-weight:600;margin-bottom:10px"></label>
+      <div id="dimBox" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+    </div>
+    <div style="text-align:center;padding:20px 0">
+      <button class="btn" id="bSub" disabled onclick="risultati()"></button>
+    </div>
+  </div>
+</div>
+
+<div id="p-res" style="display:none"><div class="wrap" id="resBox"></div></div>
+
+<script>
+var DOMANDE = [{"id": 1, "ax": "pot", "it": {"n": "1. Problema sentito", "q": "Il tuo brand risolve un problema che il cliente sente davvero importante?", "s": ["Ti sei mai chiesto se il tuo prodotto risolve un problema che al tuo cliente importa davvero?", "Pensa alle evidenze che hai raccolto: conversazioni con i clienti, motivazioni d'acquisto, rinnovi, feedback, trattative vinte o perse. Quello che offri risponde a qualcosa che, per quel pubblico, ha un peso reale?", "Qui “problema” va inteso in senso ampio. Può essere un bisogno funzionale o economico, ma anche un desiderio, un risultato che la persona vuole raggiungere, un bisogno di appartenenza, status, riconoscimento o espressione di sé.", "Un brand con rilevanza potenziale non è semplicemente un'opzione in più: ha la capacità di rispondere a qualcosa che, per quel pubblico, conta davvero."]}, "en": {"n": "1. A felt problem", "q": "Does your brand solve a problem your customer genuinely cares about?", "s": ["Think about the evidence you've gathered: customer conversations, reasons for buying, renewals, feedback, deals won and lost. Does what you offer answer something that truly weighs for that audience?", "“Problem” here is broad — it can be a functional or economic need, but also a desire, an outcome someone wants to reach, a need for belonging, status, recognition, or self-expression.", "A brand with potential relevance isn't just one more option: it has the capacity to answer something that genuinely matters to that audience."]}}, {"id": 2, "ax": "pot", "it": {"n": "2. Difficile da sostituire", "q": "Quello che il tuo brand offre sarebbe difficile da sostituire per il target che hai in mente?", "s": ["Pensa al pubblico che hai scelto e alle alternative concrete che ha a disposizione. Sulla base delle evidenze che possiedi, se dovesse rinunciare alla tua offerta troverebbe facilmente qualcosa di equivalente oppure perderebbe qualcosa che per lui conta?", "Può essere un risultato, una qualità, un'esperienza, una relazione, una competenza, una semplicità, una convenienza o un modo particolare di ottenere ciò che cerca.", "Non significa che il tuo brand debba essere unico o privo di concorrenti. La domanda è un'altra: quanto facilmente un'alternativa potrebbe sostituire ciò che la tua offerta è in grado di rappresentare o produrre per quel pubblico?", "Più le alternative risultano equivalenti rispetto a ciò che per quel pubblico conta, più debole è la rilevanza potenziale. Più la sostituzione comporta la perdita di qualcosa di significativo, più esiste una ragione concreta perché quel brand continui a contare."]}, "en": {"n": "2. Hard to replace", "q": "Would what you offer be hard to replace for the audience you have in mind?", "s": ["Think about the audience you've chosen and the real alternatives available to them. Based on the evidence you have, if they had to give up your offering, would they easily find something equivalent — or would they lose something that matters to them?", "It could be an outcome, a quality, an experience, a relationship, a competence, a simplicity, a convenience, or a particular way of getting what they're after.", "This doesn't mean your brand has to be unique or without competitors. The question is different: how easily could an alternative replace what your offering represents or produces for that audience?", "The more the alternatives feel equivalent, the weaker your potential relevance. The more replacing you would mean losing something significant, the stronger the reason for that brand to keep mattering."]}}, {"id": 3, "ax": "pot", "it": {"n": "3. Qualità distintiva", "q": "Quello che vendi ha una qualità, un'esperienza o una capacità che pochi altri nel mercato hanno davvero?", "s": ["Prova a togliere per un momento comunicazione, tono di voce, sito, packaging e presentazione commerciale. Resta qualcosa di sostanziale che, per il pubblico che hai scelto, distingue davvero la tua offerta dalle alternative?", "Può essere una qualità del prodotto, un'esperienza, una competenza, un processo, un ingrediente, un'infrastruttura, una relazione, un know-how, un modello di servizio o una capacità costruita nel tempo.", "Non deve essere necessariamente unico al mondo o impossibile da copiare. Deve però essere reale, significativo per quel pubblico e sufficientemente distintivo da contribuire alla ragione per cui il brand può contare.", "Se fai fatica a indicare con precisione quale elemento produce questa differenza, chiediti quali evidenze hai per sostenerla e se ciò che dall'interno consideri speciale lo sia davvero rispetto alle alternative concrete."]}, "en": {"n": "3. Distinctive quality", "q": "Does what you sell have a quality, an experience, or a capability that few others in the market genuinely have?", "s": ["For a moment, strip away communication, tone of voice, website, packaging, and sales presentation. Is there something substantial left that truly sets your offering apart for the audience you've chosen?", "It could be a product quality, an experience, a competence, a process, an ingredient, an infrastructure, a relationship, a know-how, a service model, or a capability built over time.", "It doesn't have to be unique in the world or impossible to copy. But it must be real, meaningful to that audience, and distinctive enough to contribute to the reason the brand can matter.", "If you struggle to point precisely to what creates this difference, ask yourself what evidence you have for it — and whether what you consider special from the inside really is, compared to the concrete alternatives."]}}, {"id": 4, "ax": "pot", "it": {"n": "4. Test della scomparsa", "q": "Se il tuo brand domani smettesse di esistere, i clienti che hai in mente se ne accorgerebbero rapidamente?", "s": ["Pensa al pubblico che hai scelto e alle evidenze che hai raccolto nel tempo. Se il tuo brand smettesse di esistere, la sua assenza lascerebbe un vuoto riconoscibile per quelle persone oppure il passaggio a un'alternativa sarebbe quasi indifferente?", "Quel vuoto può riguardare un risultato, un'esperienza, una relazione, una sicurezza, un'abitudine significativa, un modo particolare di risolvere un problema o di ottenere qualcosa che per quel pubblico conta.", "Questa domanda non misura quante alternative esistono, ma quanto peserebbe la tua assenza. Un brand può avere molti sostituti sulla carta e lasciare comunque un vuoto difficile da colmare.", "Più l'assenza del brand comporterebbe la perdita di qualcosa di significativo per quel pubblico, più forte è il segnale di rilevanza potenziale: è la differenza tra essere rimpiazzabili ed essere dimenticabili."]}, "en": {"n": "4. The disappearance test", "q": "If your brand disappeared tomorrow, would the customers you have in mind notice quickly?", "s": ["Think about the audience you've chosen and the evidence you've gathered over time. If your brand ceased to exist, would its absence leave a recognizable gap for those people — or would switching to an alternative be almost effortless?", "That gap could involve an outcome, an experience, a relationship, a sense of security, a meaningful habit, a particular way of solving a problem or getting something that matters to that audience.", "This question doesn't measure how many alternatives exist, but how much your absence would weigh. A brand can have many substitutes on paper and still leave a gap that's hard to fill.", "The more your brand's absence would mean losing something significant, the stronger the signal of potential relevance: it's the difference between being replaceable and being forgettable."]}}, {"id": 5, "ax": "per", "it": {"n": "5. Nominato spontaneamente", "q": "Il tuo brand viene nominato spontaneamente quando si parla della categoria in cui opera?", "s": ["Pensa al pubblico che hai scelto e alle evidenze che hai a disposizione. Quando quelle persone parlano della categoria, delle alternative o del bisogno che il tuo brand può soddisfare, il tuo nome emerge spontaneamente oppure deve essere suggerito?", "Puoi cercare questo segnale nelle conversazioni con clienti e potenziali clienti, nelle ricerche, nelle richieste commerciali, nelle recensioni, nelle community o in altri contesti in cui quel pubblico parla e sceglie.", "Essere nominati spontaneamente non significa soltanto essere conosciuti. È un segnale più interessante quando mostra che il brand è già collegato, nella mente di quel pubblico, alla categoria o alla situazione in cui la scelta può prendere forma.", "Più il brand emerge senza bisogno di essere sollecitato, più è probabile che abbia costruito una presenza mentale riconoscibile presso quel pubblico. Da solo, questo segnale non basta a dimostrare alta rilevanza percepita: va letto insieme alle altre domande dell'asse."]}, "en": {"n": "5. Named spontaneously", "q": "Is your brand named spontaneously when people talk about the category you operate in?", "s": ["Think about the audience you've chosen and the evidence you have. When those people talk about the category, the alternatives, or the need your brand can meet, does your name come up on its own — or does it have to be prompted?", "You can look for this signal in conversations with customers and prospects, in searches, in sales inquiries, in reviews, in communities, or in any other context where that audience talks and chooses.", "Being named spontaneously isn't only about being known. It's a more telling signal when it shows the brand is already linked, in that audience's mind, to the category or the situation where the choice takes shape.", "The more the brand comes up without being prompted, the more likely it has built a recognizable mental presence with that audience. On its own, this signal isn't enough to prove high perceived relevance: read it together with the other questions on this axis."]}}, {"id": 6, "ax": "per", "it": {"n": "6. Presente alla scelta", "q": "Quando un cliente sta per scegliere qualcosa della tua categoria, il tuo brand è presente?", "s": ["Pensa al pubblico che hai scelto e al momento di scelta che hai definito. Nei luoghi in cui quella decisione prende realmente forma, il tuo brand è presente?", "Può trattarsi di uno scaffale, di un motore di ricerca, di un marketplace, della carta di un ristorante, del consiglio di un professionista, di una conversazione tra pari, di una recensione o di qualunque altro punto che abbia un ruolo concreto nella scelta.", "La presenza non coincide con la rilevanza, ma è una condizione perché la rilevanza possa entrare nella scelta. Un brand può avere valore ed essere riconosciuto, ma se non compare nei momenti e nei luoghi che contano per quel pubblico, quel valore rischia di restare fuori dalla decisione.", "La domanda, quindi, non è quanto il brand sia presente in assoluto, ma se sia presente nei punti che hanno concretamente peso per quel pubblico e per quella specifica scelta. Qui stai verificando se il brand c'è. Più avanti verificherai se, una volta presente, viene anche preso in considerazione."]}, "en": {"n": "6. Present at the choice", "q": "When a customer is about to choose something in your category, is your brand there?", "s": ["Think about the audience you've chosen and the moment of choice you've defined. In the places where that decision actually takes shape, is your brand present?", "It could be a shelf, a search engine, a marketplace, a restaurant menu, a professional's recommendation, a conversation among peers, a review, or any other point that plays a real role in the choice.", "Presence doesn't equal relevance, but it's the condition for relevance to enter the choice at all. A brand can have value and be recognized, yet if it doesn't show up in the moments and places that matter to that audience, that value risks staying outside the decision.", "The question, then, isn't how present the brand is in absolute terms, but whether it's present at the points that concretely carry weight for that audience and that specific choice. Here you're checking whether the brand is there. Later you'll check whether, once present, it's also taken into consideration."]}}, {"id": 7, "ax": "per", "it": {"n": "7. Segnale chiaro", "q": "Le persone del pubblico che hai scelto sanno descrivere il tuo brand con parole loro?", "s": ["Pensa al pubblico che hai scelto e alle evidenze che hai raccolto. Quando quelle persone parlano del tuo brand, riescono a spiegare con parole proprie che cosa rappresenta, che cosa offre o perché potrebbe contare per loro?", "Ricevi una risposta precisa — “ah, voi siete quelli che…” — oppure descrizioni vaghe, generiche o intercambiabili con quelle di molti altri brand?", "Non stai cercando la ripetizione dello slogan o delle parole usate dall'azienda. Le espressioni possono essere diverse: ciò che conta è che il significato centrale rimanga riconoscibile e sufficientemente coerente.", "Quando persone diverse restituiscono, con parole proprie, un'idea simile di ciò che il brand rappresenta, è un segnale che il valore è arrivato in modo leggibile. Quando invece le descrizioni sono confuse, molto diverse tra loro o genericamente positive, il brand potrebbe non avere ancora costruito un significato abbastanza chiaro nella mente di quel pubblico."]}, "en": {"n": "7. A clear signal", "q": "Can the people in your chosen audience describe your brand in their own words?", "s": ["Think about the audience you've chosen and the evidence you've gathered. When those people talk about your brand, can they explain in their own words what it stands for, what it offers, or why it might matter to them?", "Do you get a precise answer — “oh, you're the ones who…” — or vague, generic descriptions, interchangeable with those of many other brands?", "You're not looking for the slogan repeated back, or the company's own words. The expressions can differ: what matters is that the core meaning stays recognizable and consistent enough.", "When different people give back, in their own words, a similar idea of what the brand stands for, it's a signal the value has landed legibly. When the descriptions are confused, wildly different from one another, or just generically positive, the brand may not yet have built a clear enough meaning in that audience's mind."]}}, {"id": 8, "ax": "per", "it": {"n": "8. Presa in considerazione", "q": "Nel momento di scelta che hai dichiarato, il tuo brand viene preso in considerazione?", "s": ["Pensa al pubblico e al momento di scelta che hai definito. Sulla base delle evidenze che hai a disposizione, il tuo brand entra già tra le alternative che quelle persone possono prendere concretamente in considerazione?", "Compare nelle shortlist, nelle richieste di informazioni, nei confronti con i concorrenti, nelle trattative o negli altri segnali attraverso cui, nella tua categoria, puoi osservare che un brand è diventato una possibilità reale?", "Essere presenti non basta. Un brand può comparire nel momento giusto e restare comunque fuori dalla considerazione, perché il pubblico non comprende ancora abbastanza chiaramente perché dovrebbe prenderlo in esame rispetto alle alternative.", "La domanda 6 verifica se il brand è presente nel momento della scelta. Questa verifica se quella presenza si traduce in considerazione. Essere preso in considerazione non significa essere scelto: significa essere entrato nel campo della decisione."]}, "en": {"n": "8. Taken into consideration", "q": "At the moment of choice you've defined, is your brand taken into consideration?", "s": ["Think about the audience and the moment of choice you've defined. Based on the evidence you have, does your brand already enter the set of alternatives those people can concretely consider?", "Does it show up in shortlists, in requests for information, in comparisons with competitors, in negotiations, or in the other signals through which — in your category — you can observe that a brand has become a real possibility?", "Being present isn't enough. A brand can show up at the right moment and still stay outside consideration, because the audience doesn't yet understand clearly enough why they should weigh it against the alternatives.", "Question 6 checks whether the brand is present at the moment of choice. This one checks whether that presence translates into consideration. Being taken into consideration doesn't mean being chosen: it means having genuinely entered the field of the decision."]}}];
+var QUADRANTI = {"invisibile": {"cod": "Q1", "col": "#999", "sfondo": "#F5F5F3", "xy": "basso-sx", "it": {"nome": "Invisibile", "desc": "Né sostanza distintiva né presenza nella mente del cliente.", "prob": "Il problema non è la comunicazione. È la mancanza di una ragione forte per essere scelti.", "az": [["Costruisci prima, parla dopo", "Quale problema risolvi, per chi, meglio di chi. Solo quando questa risposta regge davanti ai clienti reali ha senso amplificarla."], ["Testa nel reale", "Verifica su un contesto limitato se il brand inizia a essere notato e ricordato. Senza questo segnale, comunicare amplifica solo il vuoto."], ["Muovi prima l'asse debole", "Solo quando le prime quattro domande restituiscono almeno tre sì ha senso alzare la voce."]], "avviso": "Amplificare un brand che non ha ancora sostanza distintiva significa rendere più visibile un vuoto.", "esempio": "Per esempio: Nokia."}, "en": {"nome": "Invisible", "desc": "Neither distinctive substance nor presence in the customer's mind.", "prob": "It's not a communication problem. It's the lack of a strong reason to be chosen.", "az": [["Build first, talk later", "What problem you solve, for whom, better than whom. Only when that answer holds up in front of real customers does it make sense to amplify it."], ["Test in the real world", "Check, in a limited setting, whether the brand starts to get noticed and remembered. Without that signal, communicating only amplifies the void."], ["Move the weak axis first", "Only when the first four questions return at least three yeses does it make sense to raise your voice."]], "avviso": "Amplifying a brand that doesn't yet have distinctive substance means making a void more visible.", "esempio": "For example: Nokia."}}, "promessa": {"cod": "Q2", "col": "#C75D3A", "sfondo": "#FDF5F2", "xy": "alto-sx", "it": {"nome": "Promessa fragile", "desc": "La percezione è corsa avanti. La sostanza non c'è ancora.", "prob": "Il mercato ha creduto a una promessa che il brand non è ancora in grado di mantenere.", "az": [["Alza la sostanza", "Migliorare prodotto, servizio, delivery, esperienza. Porta la realtà all'altezza della narrazione."], ["Oppure abbassa la promessa", "Comunicare in modo più sobrio. Nel breve sembra perdita di ambizione. Nel lungo, protegge il brand."], ["Sospendi la spinta", "È l'unico quadrante in cui alzare la voce peggiora le cose: più visibilità significa più persone che verificano una promessa che non regge."]], "avviso": "Il tempo lavora contro il brand. Ogni giorno in cui la promessa resta più alta della realtà rende il gap più visibile.", "esempio": "Per esempio: Mr Beast Burger."}, "en": {"nome": "Fragile Promise", "desc": "Perception has run ahead. The substance isn't there yet.", "prob": "The market believed a promise the brand can't yet keep.", "az": [["Raise the substance", "Improve product, service, delivery, experience. Bring reality up to the level of the story."], ["Or lower the promise", "Communicate more soberly. In the short term it looks like a loss of ambition. In the long term, it protects the brand."], ["Suspend the push", "This is the one quadrant where raising your voice makes things worse: more visibility means more people testing a promise that doesn't hold."]], "avviso": "Time works against the brand. Every day the promise stays higher than reality makes the gap more visible.", "esempio": "For example: Mr Beast Burger."}}, "sottovalutato": {"cod": "Q3", "col": "#2E7DAF", "sfondo": "#F2F7FB", "xy": "basso-dx", "it": {"nome": "Sottovalutato", "desc": "La sostanza c'è. Il mercato non la vede ancora.", "prob": "Il brand ha sostanza, ma non entra con sufficiente forza nei momenti di scelta.", "az": [["Presidia dove si decide", "Scaffale, ricerca, consiglio professionale, social, comparatori. Non ovunque: nei punti che contano."], ["Semplifica il segnale", "Se ogni cliente descrive il brand in modo diverso, il valore esiste ma non è abbastanza chiaro."], ["Costruisci continuità", "Essere sempre un po' visibili, nei luoghi giusti, è più utile che essere molto visibili una volta ogni tanto."]], "avviso": "Non serve inventarsi un altro brand. Serve far vedere meglio quello che il brand è già.", "esempio": "Per esempio: Decathlon."}, "en": {"nome": "Underestimated", "desc": "The substance is there. The market doesn't see it yet.", "prob": "The brand has substance, but it doesn't enter the moments of choice with enough force.", "az": [["Hold the ground where decisions are made", "Shelf, search, professional recommendation, social, comparison sites. Not everywhere: in the points that count."], ["Simplify the signal", "If every customer describes the brand differently, the value exists but isn't clear enough."], ["Build continuity", "Being always a little visible, in the right places, is more useful than being very visible once in a while."]], "avviso": "You don't need to invent another brand. You need to make what the brand already is more visible.", "esempio": "For example: Decathlon."}}, "rilevante": {"cod": "Q4", "col": "#B8861B", "sfondo": "#FBF7EF", "xy": "alto-dx", "it": {"nome": "Brand rilevante", "desc": "La sostanza c'è. Il mercato la riconosce.", "prob": "Il problema non è arrivare. È restare.", "az": [["Monitora promessa ed esperienza", "La rilevanza si erode lentamente: cambia il contesto, si standardizza l'esperienza, si allenta la coerenza."], ["Difendi il lungo periodo", "Continuare a investire nel brand mentre si sostiene la performance. È il solo modo per mantenere la posizione."], ["Rinnova senza tradire", "Aggiornare i segnali senza rompere la continuità. Rinnovare senza perdere ciò che rende il brand riconoscibile."]], "avviso": "Anche un brand rilevante può smettere di esserlo, se continua a contare su ciò che lo rendeva tale ieri.", "esempio": "Per esempio: Nutella."}, "en": {"nome": "Relevant Brand", "desc": "The substance is there. The market recognizes it.", "prob": "The problem isn't arriving. It's staying.", "az": [["Monitor promise and experience", "Relevance erodes slowly: the context shifts, the experience gets standardized, the coherence loosens."], ["Defend the long term", "Keep investing in the brand while sustaining performance. It's the only way to hold the position."], ["Renew without betraying", "Update the signals without breaking continuity. Refresh without losing what makes the brand recognizable."]], "avviso": "Even a relevant brand can stop being one, if it keeps relying on what made it relevant yesterday.", "esempio": "For example: Nutella."}}};
+var UI = {"it": {"kicker": "Il marketing della rilevanza", "titolo": "Dove sei sulla mappa?", "sub1": "Otto domande. Due assi. Quattro posizioni.", "sub2": "Rispondi sì solo quando lo fai con convinzione. Se devi spiegare troppo, probabilmente è no.", "inizia": "Inizia il test", "tag1": "Potenziale × Percepita", "tag2": "8 domande", "ax1": "Asse 1 — Rilevanza potenziale", "ax1s": "La capacità dell'offerta di contare per il pubblico che hai scelto.", "ax2": "Asse 2 — Rilevanza percepita", "ax2s": "Quanto di quel valore quel pubblico riconosce nel momento della scelta.", "perche": "perché questa domanda?", "nascondi": "nascondi", "si": "Sì", "no": "No", "di": "di", "domande": "domande", "duecose": "Ancora due cose", "duecose_s": "Servono a confrontare il tuo risultato con quello di brand simili al tuo. Dati anonimi.", "settore_l": "In che settore opera il brand?", "seleziona": "Seleziona…", "dim_l": "Quanti dipendenti ha l'azienda?", "completa": "Completa settore e dimensione", "scopri": "Scopri dove sei sulla mappa", "ilproblema": "Il problema", "cosafare": "Cosa fare", "pot_l": "Potenziale", "per_l": "Percepita", "soglia": "su 4 — soglia 3", "nonlosai": "Non lo sai ancora", "nonlosai_t": "Un 2-2 sembra equilibrio, ma spesso indica che a diverse domande hai risposto senza un'evidenza chiara. Prima di scegliere un quadrante, torna ad ascoltare il cliente: la diagnosi diventa affidabile solo quando le risposte poggiano su prove, non su impressioni.", "mappa1": "La matrice è una mappa.", "mappa2": "La strategia è la direzione che scegli di prendere.", "firma": "Barbara Lorenzini — parliamodimarketing.it", "rifai": "Rifai il test", "chiusura": "Il quadrante in cui ti trovi oggi non è una sentenza. È una posizione. E le posizioni si cambiano.", "sodd_titolo": "Prima di andare", "sodd_dom": "Quanto ti riconosci in questo risultato?", "sodd_min": "Per niente", "sodd_max": "Del tutto", "sodd_grazie": "Grazie! Il tuo riscontro ci aiuta a migliorare.", "sodd_salta": "Vai al risultato senza rispondere", "settori": ["Alimentare / Bevande", "Moda / Abbigliamento", "Bellezza / Cosmetica", "Casa / Arredamento", "Tecnologia / Software", "Servizi finanziari / Assicurazioni", "Salute / Benessere", "Turismo / Ospitalità", "Automotive", "Retail / Distribuzione", "Servizi professionali / Consulenza", "Industria / Manifattura", "Educazione / Formazione", "Media / Editoria", "Altro"]}, "en": {"kicker": "The marketing of relevance", "titolo": "Where are you on the map?", "sub1": "Eight questions. Two axes. Four positions.", "sub2": "Answer yes only when you mean it. If you have to explain too much, it's probably a no.", "inizia": "Start the test", "tag1": "Potential × Perceived", "tag2": "8 questions", "ax1": "Axis 1 — Potential relevance", "ax1s": "Your offering's capacity to matter to the audience you've chosen.", "ax2": "Axis 2 — Perceived relevance", "ax2s": "How much of that value your chosen audience recognizes at the moment of choice.", "perche": "why this question?", "nascondi": "hide", "si": "Yes", "no": "No", "di": "of", "domande": "questions", "duecose": "Two more things", "duecose_s": "They help compare your result with brands similar to yours. Anonymous data.", "settore_l": "What sector does the brand operate in?", "seleziona": "Select…", "dim_l": "How many employees does the company have?", "completa": "Complete sector and size", "scopri": "See where you are on the map", "ilproblema": "The problem", "cosafare": "What to do", "pot_l": "Potential", "per_l": "Perceived", "soglia": "of 4 — threshold 3", "nonlosai": "You don't know yet", "nonlosai_t": "A 2-2 looks like balance, but it often means you answered several questions without clear evidence. Before choosing a quadrant, go back and listen to the customer: the diagnosis becomes reliable only when the answers rest on proof, not on impressions.", "mappa1": "The matrix is a map.", "mappa2": "Strategy is the direction you choose to take.", "firma": "Barbara Lorenzini — parliamodimarketing.it", "rifai": "Take the test again", "chiusura": "The quadrant you're in today isn't a verdict. It's a position. And positions can change.", "sodd_titolo": "Before you go", "sodd_dom": "How much do you recognize yourself in this result?", "sodd_min": "Not at all", "sodd_max": "Completely", "sodd_grazie": "Thank you! Your feedback helps us improve.", "sodd_salta": "Go to the result without answering", "settori": ["Food / Beverage", "Fashion / Apparel", "Beauty / Cosmetics", "Home / Furniture", "Technology / Software", "Financial services / Insurance", "Health / Wellness", "Travel / Hospitality", "Automotive", "Retail / Distribution", "Professional services / Consulting", "Industry / Manufacturing", "Education / Training", "Media / Publishing", "Other"]}};
+var lang = "it";
+var ans = {};
+var apri = {};
+var dimSel = "";
+var FASCE = ["1-9","10-49","50-249","250+"];
+
+// All'avvio: se il link contiene ?lang=it o ?lang=en, parte dritto in quella lingua.
+window.addEventListener("DOMContentLoaded", function(){
+  var params = new URLSearchParams(window.location.search);
+  var l = params.get("lang");
+  if(l === "it" || l === "en"){ setLang(l); }
+});
+
+function T(k){ return UI[lang][k]; }
+
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.getElementById("p-lang").style.display = "none";
+  var intro = document.getElementById("p-intro");
+  intro.style.display = "flex";
+  // riempio i testi intro
+  document.getElementById("i-kicker").textContent = T("kicker");
+  document.getElementById("i-titolo").textContent = T("titolo");
+  document.getElementById("i-sub1").textContent = T("sub1");
+  document.getElementById("i-sub2").textContent = T("sub2");
+  document.getElementById("i-inizia").textContent = T("inizia");
+  document.getElementById("i-tag1").textContent = T("tag1");
+  document.getElementById("i-tag2").textContent = T("tag2");
+}
+
+function inizia(){
+  document.getElementById("p-intro").style.display = "none";
+  document.getElementById("p-test").style.display = "block";
+  // testi fissi del test
+  document.getElementById("t-titolo").textContent = T("titolo");
+  document.getElementById("t-ax1").textContent = T("ax1");
+  document.getElementById("t-ax1s").textContent = T("ax1s");
+  document.getElementById("t-ax2").textContent = T("ax2");
+  document.getElementById("t-ax2s").textContent = T("ax2s");
+  document.getElementById("t-duecose").textContent = T("duecose");
+  document.getElementById("t-duecose-s").textContent = T("duecose_s");
+  document.getElementById("t-settore-l").textContent = T("settore_l");
+  document.getElementById("t-dim-l").textContent = T("dim_l");
+  // popolo il select settori
+  var sel = document.getElementById("settore");
+  sel.innerHTML = '<option value="">'+T("seleziona")+'</option>';
+  var settori = UI[lang].settori;
+  for(var i=0;i<settori.length;i++){ sel.innerHTML += '<option>'+settori[i]+'</option>'; }
+  disegna();
+  disegnaDim();
+  aggiorna();
+}
+
+function rispondi(id,val){ ans[id]=val; disegna(); aggiorna(); }
+function toggle(id){ apri[id]=!apri[id]; disegna(); }
+
+function disegna(){
+  var b1=document.getElementById("box1"), b2=document.getElementById("box2");
+  b1.innerHTML=""; b2.innerHTML="";
+  for(var i=0;i<DOMANDE.length;i++){
+    var d=DOMANDE[i], t=d[lang];
+    var html='<div class="card'+(ans[d.id]!==undefined?' done':'')+'">';
+    html+='<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px">'+t.n+'</div>';
+    html+='<p style="font-size:16px;font-weight:600;line-height:1.55;margin-bottom:12px">'+t.q+'</p>';
+    html+='<button class="perche" onclick="toggle('+d.id+')">'+(apri[d.id]?'&minus; '+T("nascondi"):'&#43; '+T("perche"))+'</button>';
+    if(apri[d.id]){ html+='<div class="spieg">'; for(var k=0;k<t.s.length;k++){ html+='<p>'+t.s[k]+'</p>'; } html+='</div>'; }
+    html+='<div style="display:flex;gap:10px">';
+    html+='<button class="qbtn'+(ans[d.id]===1?' si':'')+'" onclick="rispondi('+d.id+',1)">'+T("si")+'</button>';
+    html+='<button class="qbtn'+(ans[d.id]===0?' no':'')+'" onclick="rispondi('+d.id+',0)">'+T("no")+'</button>';
+    html+='</div></div>';
+    if(d.ax==="pot") b1.innerHTML+=html; else b2.innerHTML+=html;
+  }
+}
+
+function disegnaDim(){
+  var box=document.getElementById("dimBox"); box.innerHTML="";
+  for(var i=0;i<FASCE.length;i++){
+    var f=FASCE[i], sel=(dimSel===f);
+    box.innerHTML+='<button onclick="scegliDim(\''+f+'\')" style="flex:1;min-width:70px;padding:11px 0;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer;'+
+      (sel?"border:2px solid #D4922A;background:#FBF3E6;color:#A06D10;font-weight:700":"border:1px solid #E8E5DF;background:#FAFAF7;color:#555;font-weight:500")+'">'+f+'</button>';
+  }
+}
+function scegliDim(f){ dimSel=f; disegnaDim(); checkPronto(); }
+
+function aggiorna(){
+  var n=Object.keys(ans).length;
+  document.getElementById("cnt").textContent=n+" "+T("di")+" 8";
+  document.getElementById("bf").style.width=(n/8*100)+"%";
+  checkPronto();
+}
+function checkPronto(){
+  var n=Object.keys(ans).length;
+  var settore=document.getElementById("settore")?document.getElementById("settore").value:"";
+  var b=document.getElementById("bSub");
+  if(n===8 && settore && dimSel){ b.disabled=false; b.textContent=T("scopri"); }
+  else { b.disabled=true; if(n<8) b.textContent=n+"/8 "+T("domande"); else b.textContent=T("completa"); }
+}
+
+function trovaQ(p,r){ if(p>=3&&r>=3)return "rilevante"; if(p<3&&r>=3)return "promessa"; if(p>=3&&r<3)return "sottovalutato"; return "invisibile"; }
+
+var datiTest = null;   // memorizzo i dati del test in attesa dell'invio col voto
+var inviato = false;   // per non inviare due volte
+
+function inviaRisultato(voto){
+  if(inviato) return;
+  inviato = true;
+  try{
+    var url="https://docs.google.com/forms/d/e/1FAIpQLSf6eTj72yw7vMgSLD3wn8r5An-s2RvNPUZMu4NHkTnGGihVCQ/formResponse";
+    var fd=new FormData();
+    fd.append("entry.132908770", datiTest.quad);
+    fd.append("entry.683342459", datiTest.pot);
+    fd.append("entry.1384225030", datiTest.per);
+    fd.append("entry.635776341", document.getElementById("settore").value);
+    fd.append("entry.1173721719", dimSel);
+    fd.append("entry.1362765793", lang);
+    fd.append("entry.718844268", voto);   // soddisfazione (vuota se saltata)
+    fetch(url,{method:"POST",mode:"no-cors",body:fd});
+  }catch(e){}
+}
+
+function votaSodd(v){
+  inviaRisultato(v);
+  // sostituisco la scala con un ringraziamento
+  var box = document.getElementById("soddBox");
+  if(box){ box.innerHTML = '<div style="text-align:center;padding:20px;color:#A06D10;font-weight:600;font-size:14px">'+T("sodd_grazie")+'</div>'; }
+}
+
+function saltaSodd(){
+  inviaRisultato("");   // invio i dati del test senza voto
+  var box = document.getElementById("soddBox");
+  if(box){ box.style.display = "none"; }
+}
+
+function risultati(){
+  if(Object.keys(ans).length<8) return;
+  var ps=0, rs=0;
+  for(var i=0;i<DOMANDE.length;i++){ var d=DOMANDE[i]; if(d.ax==="pot") ps+=(ans[d.id]||0); else rs+=(ans[d.id]||0); }
+  var qk=trovaQ(ps,rs), Q=QUADRANTI[qk], q=Q[lang];
+  datiTest = {quad: Q.cod+" "+q.nome, pot: ps, per: rs}; inviato = false;
+  var xP=12+(ps/4)*76, yP=88-(rs/4)*76;
+  var h='';
+  h+='<div style="text-align:center;margin-bottom:32px">';
+  h+='<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px">'+Q.cod+'</div>';
+  h+='<div style="font-size:32px;font-weight:800;color:'+Q.col+';margin-bottom:6px">'+q.nome+'</div>';
+  h+='<p style="font-size:14px;color:#555;font-weight:500">'+q.desc+'</p></div>';
+  // matrice
+  h+='<div style="position:relative;width:100%;max-width:380px;margin:0 auto 24px">';
+  h+='<div style="position:relative;width:100%;padding-bottom:100%;border-radius:14px;border:1px solid #E8E5DF;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04)">';
+  h+='<div style="position:absolute;left:0;top:0;width:50%;height:50%;background:#FDF5F2"></div>';
+  h+='<div style="position:absolute;right:0;top:0;width:50%;height:50%;background:#FBF7EF"></div>';
+  h+='<div style="position:absolute;left:0;bottom:0;width:50%;height:50%;background:#F7F7F5"></div>';
+  h+='<div style="position:absolute;right:0;bottom:0;width:50%;height:50%;background:#F2F7FB"></div>';
+  h+='<div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#ddd"></div>';
+  h+='<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#ddd"></div>';
+  h+='<div style="position:absolute;left:25%;top:75%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#bbb;text-align:center;letter-spacing:1px;text-transform:uppercase;line-height:1.5">Q1<br>'+QUADRANTI.invisibile[lang].nome+'</div>';
+  h+='<div style="position:absolute;left:75%;top:75%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#7AABCC;text-align:center;letter-spacing:1px;text-transform:uppercase;line-height:1.5">Q3<br>'+QUADRANTI.sottovalutato[lang].nome+'</div>';
+  h+='<div style="position:absolute;left:25%;top:25%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#D4845A;text-align:center;letter-spacing:1px;text-transform:uppercase;line-height:1.5">Q2<br>'+QUADRANTI.promessa[lang].nome+'</div>';
+  h+='<div style="position:absolute;left:75%;top:25%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#C9A050;text-align:center;letter-spacing:1px;text-transform:uppercase;line-height:1.5">Q4<br>'+QUADRANTI.rilevante[lang].nome+'</div>';
+  h+='<div style="position:absolute;left:'+xP+'%;top:'+yP+'%;transform:translate(-50%,-50%);z-index:10">';
+  h+='<div style="width:38px;height:38px;border-radius:50%;background:'+Q.col+';box-shadow:0 2px 12px '+Q.col+'55;display:flex;align-items:center;justify-content:center;animation:pp 2.5s ease-in-out infinite">';
+  h+='<span style="font-size:10px;font-weight:800;color:#fff;letter-spacing:1px">'+(lang==="it"?"TU":"YOU")+'</span></div></div>';
+  h+='<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:9px;color:#bbb;font-weight:700;letter-spacing:2px;text-transform:uppercase">'+T("pot_l")+' &rarr;</div>';
+  h+='<div style="position:absolute;left:8px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center;font-size:9px;color:#bbb;font-weight:700;letter-spacing:2px;text-transform:uppercase">'+T("per_l")+' &rarr;</div>';
+  h+='</div></div>';
+  // punteggi
+  h+='<div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px">';
+  h+='<div style="flex:1;max-width:150px;background:#fff;border-radius:10px;padding:16px 12px;text-align:center;border:1px solid #E8E5DF"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:4px">'+T("pot_l")+'</div><div style="font-size:30px;font-weight:800">'+ps+'</div><div style="font-size:11px;color:#888">'+T("soglia")+'</div></div>';
+  h+='<div style="flex:1;max-width:150px;background:#fff;border-radius:10px;padding:16px 12px;text-align:center;border:1px solid #E8E5DF"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:4px">'+T("per_l")+'</div><div style="font-size:30px;font-weight:800">'+rs+'</div><div style="font-size:11px;color:#888">'+T("soglia")+'</div></div>';
+  h+='</div>';
+  // quinto esito 2-2
+  if(ps===2 && rs===2){
+    h+='<div style="background:#FBF3E6;border:1px solid #EDD9A8;border-radius:10px;padding:18px;margin-bottom:20px;text-align:center">';
+    h+='<div style="font-size:14px;font-weight:700;color:#A06D10;margin-bottom:6px">'+T("nonlosai")+'</div>';
+    h+='<div style="font-size:13px;color:#555;line-height:1.6">'+T("nonlosai_t")+'</div></div>';
+  }
+  // problema
+  h+='<div style="background:'+Q.sfondo+';border-radius:12px;padding:22px 20px;margin-bottom:14px;border-left:3px solid '+Q.col+'">';
+  h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:8px">'+T("ilproblema")+'</div>';
+  h+='<p style="font-size:16px;font-weight:600;line-height:1.5">'+q.prob+'</p></div>';
+  h+='<div style="background:#F5F4F1;border-radius:10px;padding:14px 16px;margin-bottom:22px;border:1px solid #E8E5DF;font-size:12px;color:#555;line-height:1.5">'+q.avviso+'</div>';
+  // cosa fare
+  h+='<div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:14px">'+T("cosafare")+'</div>';
+  for(var j=0;j<q.az.length;j++){
+    h+='<div style="margin-bottom:14px;padding-left:16px;border-left:2px solid '+Q.col+'44">';
+    h+='<h4 style="font-size:14px;font-weight:700;color:'+Q.col+';margin-bottom:3px">'+q.az[j][0]+'</h4>';
+    h+='<p style="font-size:13px;color:#555;font-weight:500;line-height:1.6">'+q.az[j][1]+'</p></div>';
+  }
+  // esempio (neutro, no libro)
+  h+='<div style="background:#F5F4F1;border-radius:10px;padding:14px 16px;margin:18px 0;border:1px solid #E8E5DF;font-size:13px;color:#555;font-weight:500">'+q.esempio+'</div>';
+  // firma
+  // --- SCALA SODDISFAZIONE 0-10 (Modo C: invio col voto o col salta) ---
+  h+='<div id="soddBox" style="margin:36px 0 8px;padding:24px 20px;background:#fff;border-radius:12px;border:1px solid #E8E5DF">';
+  h+='<div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D4922A;margin-bottom:4px;text-align:center">'+T("sodd_titolo")+'</div>';
+  h+='<p style="font-size:15px;font-weight:600;text-align:center;margin-bottom:16px">'+T("sodd_dom")+'</p>';
+  h+='<div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">';
+  for(var v=0; v<=10; v++){
+    h+='<button onclick="votaSodd('+v+')" style="width:34px;height:34px;border-radius:8px;border:1px solid #E8E5DF;background:#FAFAF7;color:#555;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer" onmouseover="this.style.borderColor=\'#D4922A\';this.style.background=\'#FBF3E6\'" onmouseout="this.style.borderColor=\'#E8E5DF\';this.style.background=\'#FAFAF7\'">'+v+'</button>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;justify-content:space-between;max-width:420px;margin:0 auto 14px;font-size:11px;color:#aaa">';
+  h+='<span>0 &middot; '+T("sodd_min")+'</span><span>'+T("sodd_max")+' &middot; 10</span></div>';
+  h+='<div style="text-align:center"><button onclick="saltaSodd()" style="background:none;border:none;color:#bbb;font-size:12px;text-decoration:underline;cursor:pointer;font-family:inherit">'+T("sodd_salta")+'</button></div>';
+  h+='</div>';
+    h+='<div style="text-align:center;margin:32px 0 20px;padding:24px 20px;background:#FBF7EF;border-radius:12px;border:1px solid #EDD9A8">';
+  h+='<p style="font-size:15px;font-weight:700;margin-bottom:4px;line-height:1.4">'+T("mappa1")+'</p>';
+  h+='<p style="font-size:15px;font-weight:700;color:#D4922A;margin-bottom:16px;line-height:1.4">'+T("mappa2")+'</p>';
+  h+='<p style="font-size:12px;color:#888;margin-bottom:14px">'+T("firma")+'</p>';
+  h+='<button style="padding:10px 24px;border-radius:8px;border:1px solid #D4922A;background:none;color:#D4922A;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer" onclick="ricomincia()">'+T("rifai")+'</button>';
+  h+='</div>';
+  h+='<p style="font-size:11px;color:#bbb;text-align:center;margin:8px 0 32px;line-height:1.6">'+T("chiusura")+'</p>';
+  document.getElementById("resBox").innerHTML=h;
+  document.getElementById("p-test").style.display="none";
+  document.getElementById("p-res").style.display="block";
+  window.scrollTo(0,0);
+}
+
+function ricomincia(){
+  ans={}; apri={}; dimSel="";
+  document.getElementById("settore").value="";
+  document.getElementById("p-res").style.display="none";
+  document.getElementById("p-intro").style.display="flex";
+}
+</script>
+</body>
+</html>
